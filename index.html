@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Musicians Helping Musicians on the Road</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E53935;
+      --dark: #111111;
+      --darker: #0a0a0a;
+      --card: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #e0e0e0;
+      --muted: #888;
+      --accent: #FF6B35;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--darker);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span { color: var(--red); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav ul a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: #fff; }
+
+    .nav-cta {
+      background: var(--red);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 6px;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover { background: #c62828 !important; color: #fff !important; }
+
+    /* HERO */
+    .hero {
+      min-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(229,57,53,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(229,57,53,0.15);
+      border: 1px solid rgba(229,57,53,0.3);
+      color: #ff8a80;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      color: #fff;
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--red);
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover { background: #c62828; transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.1s;
+      cursor: pointer;
+    }
+
+    .btn-outline:hover { border-color: #555; transform: translateY(-1px); }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 4rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--red);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    /* HOW IT WORKS */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      position: relative;
+    }
+
+    .step-num {
+      width: 40px;
+      height: 40px;
+      background: rgba(229,57,53,0.15);
+      border: 1px solid rgba(229,57,53,0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 1rem;
+    }
+
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .step p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* FEATURES GRID */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover { border-color: rgba(229,57,53,0.4); }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1rem;
+    }
+
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 3px 9px;
+      border-radius: 4px;
+    }
+
+    /* STORE FINDER MOCK */
+    .store-demo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 3rem;
+    }
+
+    .store-demo-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .store-demo-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      width: 240px;
+    }
+
+    .store-list {
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .store-card {
+      background: var(--darker);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .store-card-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0.5rem;
+    }
+
+    .store-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .store-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .store-type {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .store-meta {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    .store-open { color: #4caf50; }
+
+    /* BAND PARTNERS MOCK */
+    .band-demo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 3rem;
+    }
+
+    .band-demo-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .band-demo-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .band-demo-header p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .band-list {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .band-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--darker);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .band-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .band-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--red), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .band-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .band-genre {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .band-needs {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .need-tag {
+      background: rgba(229,57,53,0.1);
+      border: 1px solid rgba(229,57,53,0.25);
+      color: #ff8a80;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .btn-connect {
+      background: var(--red);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-connect:hover { background: #c62828; }
+
+    /* CTA */
+    .cta-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4rem 2rem;
+      text-align: center;
+      margin: 0 2rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(229,57,53,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .footer-brand {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .footer-brand span { color: var(--red); }
+
+    .footer-founder {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: #fff; }
+
+    @media (max-width: 640px) {
+      nav ul { display: none; }
+      .hero-stats { gap: 1.5rem; }
+      .search-bar { display: none; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">
+      <div class="logo-icon">🩹</div>
+      <span class="logo-text">Band<span>Aid</span></span>
+    </a>
+    <ul>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#partners">Find Partners</a></li>
+      <li><a href="#stores">Local Stores</a></li>
+      <li><a href="#join" class="nav-cta">Join the Network</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🎸 For Touring Musicians</div>
+    <h1>When the tour hits trouble,<br /><em>the music plays on.</em></h1>
+    <p>
+      BandAid connects touring bands with local musicians, gear, and stores — so a broken string, missing player, or busted amp never cancels the show.
+    </p>
+    <div class="hero-actions">
+      <a href="#join" class="btn-primary">Join the Network</a>
+      <a href="#how-it-works" class="btn-outline">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">1,200+</div>
+        <div class="stat-label">Local Bands</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">340+</div>
+        <div class="stat-label">Cities</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4,800+</div>
+        <div class="stat-label">Gear Listings</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Shows Saved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">From crisis to curtain call in minutes.</h2>
+    <p class="section-sub">Whether you need a drummer for one night or a last-minute guitar amp, BandAid has you covered.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Post Your Need</h3>
+        <p>Tell us what you need — a bassist, a PA system, a drum kit, or a music store near your venue tonight.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Get Matched Locally</h3>
+        <p>BandAid surfaces verified local bands and stores within your radius, ranked by availability and gear match.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Connect &amp; Confirm</h3>
+        <p>Chat directly, agree on details, and lock it in. BandAid handles the intro — you handle the music.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Play the Show</h3>
+        <p>Hit the stage. Rate your partners after so the community stays tight and trustworthy.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything a touring band needs on the road.</h2>
+    <p class="section-sub">Two core tools built for the moments that matter most.</p>
+
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3>Band Partner Network</h3>
+        <p>Find local musicians who can step in as fill-ins or loan their gear. Browse by instrument, genre, and availability.</p>
+        <div class="feature-tags">
+          <span class="tag">Guitarists</span>
+          <span class="tag">Drummers</span>
+          <span class="tag">Bassists</span>
+          <span class="tag">Keys</span>
+          <span class="tag">Vocalists</span>
+          <span class="tag">Horns</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎸</div>
+        <h3>Gear Exchange</h3>
+        <p>Borrow, rent, or buy gear from local bands. Amps, cables, pedals, drums — whatever you need to go on tonight.</p>
+        <div class="feature-tags">
+          <span class="tag">Amps</span>
+          <span class="tag">Drums</span>
+          <span class="tag">PA Systems</span>
+          <span class="tag">Cables</span>
+          <span class="tag">Pedals</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🗺️</div>
+        <h3>Local Store Finder</h3>
+        <p>Instantly find the music stores, repair shops, and rental outlets near your venue — with hours, specialties, and reviews.</p>
+        <div class="feature-tags">
+          <span class="tag">Music Stores</span>
+          <span class="tag">Repair Shops</span>
+          <span class="tag">Rentals</span>
+          <span class="tag">Recording</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Emergency Alerts</h3>
+        <p>Broadcast an urgent need to every BandAid member in the city. Get responses within minutes, not hours.</p>
+        <div class="feature-tags">
+          <span class="tag">Same-Day</span>
+          <span class="tag">Last Minute</span>
+          <span class="tag">Push Alerts</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🌟</div>
+        <h3>Verified Profiles</h3>
+        <p>Every band and musician is reviewed by the community. Know who you're working with before the soundcheck.</p>
+        <div class="feature-tags">
+          <span class="tag">Reviews</span>
+          <span class="tag">Ratings</span>
+          <span class="tag">History</span>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎙️</div>
+        <h3>Tour Calendar</h3>
+        <p>Post your upcoming tour dates so local bands in each city know you're coming — and can prepare to help if needed.</p>
+        <div class="feature-tags">
+          <span class="tag">Routing</span>
+          <span class="tag">Pre-Planning</span>
+          <span class="tag">City Lists</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAND PARTNER DEMO -->
+  <section id="partners" style="padding-top: 0;">
+    <div class="section-label">Band Partners</div>
+    <h2 class="section-title">Local musicians ready to help.</h2>
+    <p class="section-sub">Sample listings from Nashville, TN — updated in real time.</p>
+
+    <div class="band-demo">
+      <div class="band-demo-header">
+        <h3>Available Partners Near Nashville, TN</h3>
+        <p>Showing 4 of 38 results · Tonight</p>
+      </div>
+      <div class="band-list">
+
+        <div class="band-row">
+          <div class="band-info">
+            <div class="band-avatar" style="background: linear-gradient(135deg,#e53935,#ff6b35);">RC</div>
+            <div>
+              <div class="band-name">Rust &amp; Chrome</div>
+              <div class="band-genre">Southern Rock · 4.9 ★</div>
+            </div>
+          </div>
+          <div class="band-needs">
+            <span class="need-tag">Lead Guitar</span>
+            <span class="need-tag">Marshall Amp</span>
+            <span class="need-tag">Drum Kit</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+
+        <div class="band-row">
+          <div class="band-info">
+            <div class="band-avatar" style="background: linear-gradient(135deg,#6a1b9a,#ab47bc);">TB</div>
+            <div>
+              <div class="band-name">The Buried Kings</div>
+              <div class="band-genre">Indie Rock · 4.7 ★</div>
+            </div>
+          </div>
+          <div class="band-needs">
+            <span class="need-tag">Bassist</span>
+            <span class="need-tag">DI Box</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+
+        <div class="band-row">
+          <div class="band-info">
+            <div class="band-avatar" style="background: linear-gradient(135deg,#1565c0,#42a5f5);">SV</div>
+            <div>
+              <div class="band-name">Smokehouse Voodoo</div>
+              <div class="band-genre">Blues · 5.0 ★</div>
+            </div>
+          </div>
+          <div class="band-needs">
+            <span class="need-tag">Keys</span>
+            <span class="need-tag">PA System</span>
+            <span class="need-tag">Trumpet</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+
+        <div class="band-row">
+          <div class="band-info">
+            <div class="band-avatar" style="background: linear-gradient(135deg,#2e7d32,#66bb6a);">ND</div>
+            <div>
+              <div class="band-name">Neon Desert</div>
+              <div class="band-genre">Country / Americana · 4.8 ★</div>
+            </div>
+          </div>
+          <div class="band-needs">
+            <span class="need-tag">Fiddle</span>
+            <span class="need-tag">Pedal Steel</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- STORE FINDER DEMO -->
+  <section id="stores" style="padding-top: 0;">
+    <div class="section-label">Local Store Finder</div>
+    <h2 class="section-title">The right store, right now.</h2>
+    <p class="section-sub">Find music stores, repair shops, and rentals near your next venue — open tonight.</p>
+
+    <div class="store-demo">
+      <div class="store-demo-header">
+        <h3>Stores Near Broadway, Nashville TN</h3>
+        <div class="search-bar">
+          🔍&nbsp; Search stores, gear, repairs…
+        </div>
+      </div>
+      <div class="store-list">
+
+        <div class="store-card">
+          <div class="store-card-top">
+            <div class="store-badge" style="background:rgba(229,57,53,0.15);">🎸</div>
+            <div>
+              <div class="store-name">Guitar City Nashville</div>
+              <div class="store-type">Full-Line Music Store</div>
+            </div>
+          </div>
+          <div class="store-meta">
+            <span class="store-open">● Open</span>
+            <span>0.4 mi</span>
+            <span>Closes 10 PM</span>
+          </div>
+        </div>
+
+        <div class="store-card">
+          <div class="store-card-top">
+            <div class="store-badge" style="background:rgba(33,150,243,0.15);">🔧</div>
+            <div>
+              <div class="store-name">Strings &amp; Things Repair</div>
+              <div class="store-type">Guitar &amp; Bass Repair</div>
+            </div>
+          </div>
+          <div class="store-meta">
+            <span class="store-open">● Open</span>
+            <span>0.8 mi</span>
+            <span>Closes 9 PM</span>
+          </div>
+        </div>
+
+        <div class="store-card">
+          <div class="store-card-top">
+            <div class="store-badge" style="background:rgba(76,175,80,0.15);">🥁</div>
+            <div>
+              <div class="store-name">Drumhouse Rentals</div>
+              <div class="store-type">Drum Kit Rentals</div>
+            </div>
+          </div>
+          <div class="store-meta">
+            <span class="store-open">● Open</span>
+            <span>1.1 mi</span>
+            <span>Closes 11 PM</span>
+          </div>
+        </div>
+
+        <div class="store-card">
+          <div class="store-card-top">
+            <div class="store-badge" style="background:rgba(156,39,176,0.15);">🎛️</div>
+            <div>
+              <div class="store-name">Pro Audio Plus</div>
+              <div class="store-type">PA &amp; Live Sound</div>
+            </div>
+          </div>
+          <div class="store-meta">
+            <span class="store-open">● Open</span>
+            <span>1.4 mi</span>
+            <span>Closes 8 PM</span>
+          </div>
+        </div>
+
+        <div class="store-card">
+          <div class="store-card-top">
+            <div class="store-badge" style="background:rgba(255,152,0,0.15);">🎵</div>
+            <div>
+              <div class="store-name">Music &amp; More</div>
+              <div class="store-type">Sheet Music &amp; Accessories</div>
+            </div>
+          </div>
+          <div class="store-meta">
+            <span>Closed</span>
+            <span>1.7 mi</span>
+            <span>Opens 10 AM</span>
+          </div>
+        </div>
+
+        <div class="store-card">
+          <div class="store-card-top">
+            <div class="store-badge" style="background:rgba(0,188,212,0.15);">🎤</div>
+            <div>
+              <div class="store-name">South Side Sound</div>
+              <div class="store-type">Microphones &amp; Cables</div>
+            </div>
+          </div>
+          <div class="store-meta">
+            <span class="store-open">● Open</span>
+            <span>2.0 mi</span>
+            <span>Closes 9 PM</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section" id="join">
+    <h2>Ready to never cancel a show again?</h2>
+    <p>Join thousands of touring and local musicians already on the BandAid network.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a href="#" class="btn-primary">Sign Up Free</a>
+      <a href="#" class="btn-outline">List Your Band</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <div class="footer-brand">Band<span>Aid</span></div>
+      <div class="footer-founder">Founded by Stephen Harris · Musician &amp; Vocalist</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">For Touring Bands</a>
+      <a href="#">For Local Bands</a>
+      <a href="#">Contact</a>
+    </div>
+  </footer>
+
+</body>
+</html>
