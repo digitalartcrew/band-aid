@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Reviews</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .review-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      transition: border-color 0.15s;
+      margin-bottom: 12px;
+    }
+    .review-card:hover { border-color: rgba(229,57,53,0.2); }
+
+    .review-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .review-subject-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .review-subject-name { font-size: .95rem; font-weight: 700; color: #fff; }
+    .review-subject-type { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+
+    .review-stars {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      color: var(--yellow);
+      font-size: .82rem;
+      margin-top: 4px;
+    }
+
+    .review-stars span { color: var(--muted); font-size: .72rem; margin-left: 4px; }
+
+    .review-body { font-size: .82rem; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+
+    .review-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .72rem;
+      color: var(--muted2);
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .reviewer-info {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .reviewer-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .6rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Write review modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--dark); border: 1px solid var(--border2); border-radius: 16px;
+      padding: 24px; width: 100%; max-width: 440px;
+      transform: scale(0.95); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* Star picker */
+    .star-picker {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .star-btn {
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.3;
+      transition: opacity 0.1s, transform 0.1s;
+    }
+
+    .star-btn.lit { opacity: 1; }
+    .star-btn:hover { transform: scale(1.1); }
+
+    /* Category summary bar */
+    .summary-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .summary-item { text-align: center; }
+    .summary-val { font-size: 1.3rem; font-weight: 800; color: #fff; }
+    .summary-label { font-size: .68rem; color: var(--muted); margin-top: 2px; }
+
+    .summary-divider { width: 1px; height: 36px; background: var(--border); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Connect</div>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="photographers.html" class="nav-item"><span class="nav-icon">📷</span> Photographers</a>
+      <a href="sponsors.html" class="nav-item"><span class="nav-icon">🤝</span> Sponsors</a>
+      <a href="reviews.html" class="nav-item active"><span class="nav-icon">⭐</span> Reviews</a>
+      <div class="nav-section-label">Road Life</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="wheels.html" class="nav-item"><span class="nav-icon">🚐</span> Wheels</a>
+      <a href="leisure.html" class="nav-item"><span class="nav-icon">🎉</span> Leisure</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div><div class="profile-name">Rust &amp; Chrome</div><div class="profile-role">Southern Rock · Memphis, TN</div></div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Community Reviews</h1>
+        <p>Honest reviews from touring musicians, for touring musicians</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="openModal('writeModal')">+ Write Review</button>
+        <a href="profile.html" class="avatar" style="margin-left:4px;">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- Summary bar -->
+      <div class="summary-bar">
+        <div class="summary-item"><div class="summary-val">2,841</div><div class="summary-label">Total Reviews</div></div>
+        <div class="summary-divider"></div>
+        <div class="summary-item"><div class="summary-val" style="color:#ffd54f;">4.3★</div><div class="summary-label">Avg Rating</div></div>
+        <div class="summary-divider"></div>
+        <div class="summary-item"><div class="summary-val">843</div><div class="summary-label">Venues</div></div>
+        <div class="summary-divider"></div>
+        <div class="summary-item"><div class="summary-val">614</div><div class="summary-label">Musicians</div></div>
+        <div class="summary-divider"></div>
+        <div class="summary-item"><div class="summary-val">729</div><div class="summary-label">Restaurants</div></div>
+        <div class="summary-divider"></div>
+        <div class="summary-item"><div class="summary-val">655</div><div class="summary-label">Studios &amp; Stores</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start;">
+        <div>
+
+          <!-- Filter chips -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="reviewCatBar">
+            <div class="badge badge-red" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setRevCat('all',this)">All</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setRevCat('venue',this)">🎵 Venues</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setRevCat('musician',this)">🎸 Musicians</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setRevCat('food',this)">🍕 Restaurants</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setRevCat('studio',this)">🎙 Studios</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setRevCat('store',this)">🛒 Stores</div>
+          </div>
+
+          <!-- Reviews list -->
+          <div id="reviewList">
+
+            <div class="review-card" data-rcat="venue">
+              <div class="review-header">
+                <div class="review-subject-icon" style="background:var(--red-dim);">🎵</div>
+                <div>
+                  <div class="review-subject-name">Exit/In — Nashville, TN</div>
+                  <div class="review-subject-type">Live Music Venue · 21+ · Cap. 600</div>
+                  <div class="review-stars">★★★★★ <span>5.0 — Last night</span></div>
+                </div>
+              </div>
+              <div class="review-body">"One of the best rooms we've played in the South. Sound system is killer, stage is legit, and the staff actually respects touring bands. Load-in was smooth, hospitality rider was waiting, and Jake the sound guy is a legend. We'll be back."</div>
+              <div class="review-footer">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar" style="background:linear-gradient(135deg,#e53935,#ff6b35);">RC</div>
+                  <span>Rust &amp; Chrome · Memphis, TN</span>
+                </div>
+                <span>Jun 15, 2026</span>
+              </div>
+            </div>
+
+            <div class="review-card" data-rcat="musician">
+              <div class="review-header">
+                <div class="review-subject-icon" style="background:rgba(76,175,80,0.12);">🥁</div>
+                <div>
+                  <div class="review-subject-name">Marcus Johnson — Drummer</div>
+                  <div class="review-subject-type">Fill-in Musician · Nashville, TN</div>
+                  <div class="review-stars">★★★★★ <span>5.0 — 2 days ago</span></div>
+                </div>
+              </div>
+              <div class="review-body">"Marcus saved our Atlanta show. Our drummer got sick and he jumped in with 3 hours notice — learned the full set from a Spotify playlist and a quick Zoom call. Played like he'd been in the band for years. Absolute professional."</div>
+              <div class="review-footer">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">TB</div>
+                  <span>The Buried Kings · Austin, TX</span>
+                </div>
+                <span>Jun 13, 2026</span>
+              </div>
+            </div>
+
+            <div class="review-card" data-rcat="food">
+              <div class="review-header">
+                <div class="review-subject-icon" style="background:rgba(255,107,53,0.12);">🍗</div>
+                <div>
+                  <div class="review-subject-name">Hattie B's Hot Chicken — Nashville</div>
+                  <div class="review-subject-type">Restaurant · Must-Try</div>
+                  <div class="review-stars">★★★★★ <span>5.0 — 1 week ago</span></div>
+                </div>
+              </div>
+              <div class="review-body">"Every band that comes through Nashville needs to hit Hattie B's. We go every time, no exceptions. Order the 'Damn Hot' if you're tough, 'Shut the Cluck Up' if you're brave. Skip the lunch rush — go at 3 PM."</div>
+              <div class="review-footer">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar" style="background:linear-gradient(135deg,#2e7d32,#66bb6a);">SV</div>
+                  <span>Smokehouse Voodoo · Nashville, TN</span>
+                </div>
+                <span>Jun 8, 2026</span>
+              </div>
+            </div>
+
+            <div class="review-card" data-rcat="venue">
+              <div class="review-header">
+                <div class="review-subject-icon" style="background:var(--red-dim);">🎵</div>
+                <div>
+                  <div class="review-subject-name">The Masquerade — Atlanta, GA</div>
+                  <div class="review-subject-type">Live Music Venue · 3 Stages · All Ages</div>
+                  <div class="review-stars">★★★★☆ <span>4.0 — 2 weeks ago</span></div>
+                </div>
+              </div>
+              <div class="review-body">"Good venue, three stages (Heaven, Purgatory, Hell) so you'll know which room you're in by the name. Parking is rough on show nights — arrive 2+ hours early to load in or you're stuck. Sound on the Heaven stage is world-class. Purgatory needs monitor work."</div>
+              <div class="review-footer">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar" style="background:linear-gradient(135deg,#9c27b0,#e040fb);">ND</div>
+                  <span>Neon Desert · Austin, TX</span>
+                </div>
+                <span>Jun 1, 2026</span>
+              </div>
+            </div>
+
+            <div class="review-card" data-rcat="studio">
+              <div class="review-header">
+                <div class="review-subject-icon" style="background:rgba(156,39,176,0.12);">🎙</div>
+                <div>
+                  <div class="review-subject-name">Trace Recording Studio — Nashville</div>
+                  <div class="review-subject-type">Recording Studio · $75/hr</div>
+                  <div class="review-stars">★★★★★ <span>5.0 — 3 weeks ago</span></div>
+                </div>
+              </div>
+              <div class="review-body">"Needed to track a quick acoustic demo between Nashville shows. Trace was available same day, engineer was incredible, and the room sounds amazing. $75/hr is the best deal in the city. Booked through BandAid — took 2 minutes."</div>
+              <div class="review-footer">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar" style="background:linear-gradient(135deg,#e65100,#ffa726);">RC</div>
+                  <span>Rust &amp; Chrome · Memphis, TN</span>
+                </div>
+                <span>May 28, 2026</span>
+              </div>
+            </div>
+
+            <div class="review-card" data-rcat="store">
+              <div class="review-header">
+                <div class="review-subject-icon" style="background:rgba(33,150,243,0.12);">🔧</div>
+                <div>
+                  <div class="review-subject-name">Strings &amp; Things Repair — Nashville</div>
+                  <div class="review-subject-type">Guitar Repair · Same-Day Service</div>
+                  <div class="review-stars">★★★★★ <span>5.0 — 1 month ago</span></div>
+                </div>
+              </div>
+              <div class="review-body">"Broke a tuning peg 90 minutes before load-in. Called Strings &amp; Things, they said come right now. Fixed in 45 minutes, played the show. These guys know touring musicians operate on impossible timelines and they step up every time."</div>
+              <div class="review-footer">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar" style="background:linear-gradient(135deg,#00695c,#26a69a);">CL</div>
+                  <span>Chris Lee · Nashville, TN</span>
+                </div>
+                <span>May 14, 2026</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: Top rated sidebar -->
+        <div style="position:sticky;top:84px;display:flex;flex-direction:column;gap:16px;">
+          <div class="card">
+            <div class="card-header"><span class="card-title">🏆 Top Rated This Month</span></div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:28px;height:28px;border-radius:7px;background:var(--red-dim);display:flex;align-items:center;justify-content:center;font-size:.8rem;">🎵</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:.82rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Exit/In, Nashville</div>
+                  <div style="font-size:.68rem;color:var(--muted);">Venue · ★★★★★ 5.0</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:28px;height:28px;border-radius:7px;background:rgba(76,175,80,0.12);display:flex;align-items:center;justify-content:center;font-size:.8rem;">🥁</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:.82rem;font-weight:600;color:#fff;">Marcus Johnson</div>
+                  <div style="font-size:.68rem;color:var(--muted);">Musician · ★★★★★ 5.0</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:28px;height:28px;border-radius:7px;background:rgba(255,107,53,0.12);display:flex;align-items:center;justify-content:center;font-size:.8rem;">🍗</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:.82rem;font-weight:600;color:#fff;">Hattie B's, Nashville</div>
+                  <div style="font-size:.68rem;color:var(--muted);">Restaurant · ★★★★★ 5.0</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:28px;height:28px;border-radius:7px;background:rgba(156,39,176,0.12);display:flex;align-items:center;justify-content:center;font-size:.8rem;">🎙</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:.82rem;font-weight:600;color:#fff;">Trace Recording</div>
+                  <div style="font-size:.68rem;color:var(--muted);">Studio · ★★★★★ 5.0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">⚠️ Avoid List</span></div>
+            <p style="font-size:.75rem;color:var(--muted);margin-bottom:10px;">Flagged by the community · Nashville area</p>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:.78rem;">
+              <div style="color:var(--text);">🔴 <strong>Pay-to-Play Venues</strong> — Multiple reports of demanding presales. Named in reviews.</div>
+              <div style="color:var(--text);">🔴 <strong>The Ditch — Load-in Issues</strong> — 4 bands reported broken promises on hospitality and PA.</div>
+              <div style="color:var(--text);">🟡 <strong>Sleep Inn Murfreesboro</strong> — Band gear stolen from parking lot twice in last month.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- WRITE REVIEW MODAL -->
+<div class="modal-overlay" id="writeModal" onclick="if(event.target===this)closeModal('writeModal')">
+  <div class="modal">
+    <div style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:4px;">Write a Review</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:18px;">Share your experience with the BandAid community</div>
+    <div class="input-group">
+      <label class="input-label">Category</label>
+      <select class="input"><option>🎵 Venue</option><option>🎸 Musician / Band</option><option>🍕 Restaurant</option><option>🎙 Studio</option><option>🛒 Store / Shop</option></select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Name</label>
+      <input class="input" placeholder="Who or what are you reviewing?" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">City</label>
+      <input class="input" placeholder="Nashville, TN" value="Nashville, TN" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Rating</label>
+      <div class="star-picker" id="starPicker">
+        <button class="star-btn" onclick="setStars(1)">★</button>
+        <button class="star-btn" onclick="setStars(2)">★</button>
+        <button class="star-btn" onclick="setStars(3)">★</button>
+        <button class="star-btn" onclick="setStars(4)">★</button>
+        <button class="star-btn" onclick="setStars(5)">★</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Your Review</label>
+      <textarea class="input" rows="4" placeholder="Be honest — fellow musicians are counting on you…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="closeModal('writeModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="flex:2;" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  let starCount = 0;
+  function setStars(n) {
+    starCount = n;
+    document.querySelectorAll('#starPicker .star-btn').forEach((b,i) => b.classList.toggle('lit', i < n));
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+
+  function submitReview() {
+    closeModal('writeModal');
+    const b = document.createElement('div');
+    b.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:12px 24px;border-radius:8px;font-size:.875rem;font-weight:600;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.3);';
+    b.textContent = '✓ Review submitted! Thank you.';
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 3000);
+  }
+
+  let activeCat = 'all';
+  function setRevCat(cat, el) {
+    activeCat = cat;
+    document.querySelectorAll('#reviewCatBar .badge').forEach(b => { b.className='badge badge-gray'; b.style.cssText='cursor:pointer;padding:6px 14px;font-size:.78rem;'; });
+    el.className='badge badge-red'; el.style.cssText='cursor:pointer;padding:6px 14px;font-size:.78rem;';
+    document.querySelectorAll('.review-card').forEach(c => {
+      c.style.display = (cat==='all' || c.dataset.rcat===cat) ? 'block' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

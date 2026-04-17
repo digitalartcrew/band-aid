@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Sponsors</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .sponsor-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: border-color 0.15s;
+    }
+    .sponsor-card:hover { border-color: rgba(229,57,53,0.25); }
+
+    .sponsor-logo {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .sponsor-logo-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .sponsor-name { font-size: 1.1rem; font-weight: 800; color: #fff; }
+    .sponsor-tagline { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    .sponsor-desc { font-size: .82rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+
+    .sponsor-perks {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+      padding: 12px;
+      background: var(--darker);
+      border-radius: 8px;
+    }
+
+    .perk-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: .78rem;
+      color: var(--text);
+    }
+
+    .perk-item::before {
+      content: '✓';
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .sponsor-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+
+    .endorsement-level {
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Current deals section */
+    .deal-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .deal-row:last-child { border-bottom: none; }
+
+    .deal-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .95rem;
+      flex-shrink: 0;
+    }
+
+    .deal-name { font-size: .875rem; font-weight: 600; color: #fff; }
+    .deal-meta { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+    .deal-value { font-size: .875rem; font-weight: 700; color: #81c784; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Connect</div>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="photographers.html" class="nav-item"><span class="nav-icon">📷</span> Photographers</a>
+      <a href="sponsors.html" class="nav-item active"><span class="nav-icon">🤝</span> Sponsors</a>
+      <a href="reviews.html" class="nav-item"><span class="nav-icon">⭐</span> Reviews</a>
+      <div class="nav-section-label">Road Life</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="wheels.html" class="nav-item"><span class="nav-icon">🚐</span> Wheels</a>
+      <a href="leisure.html" class="nav-item"><span class="nav-icon">🎉</span> Leisure</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div><div class="profile-name">Rust &amp; Chrome</div><div class="profile-role">Southern Rock · Memphis, TN</div></div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Sponsors &amp; Endorsements</h1>
+        <p>Connect with brands that support touring artists</p>
+      </div>
+      <div class="topbar-right">
+        <a href="profile.html" class="avatar">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- Current deals -->
+      <div class="card mb-24" style="background:linear-gradient(135deg,#0a1a0a,#152515);border-color:rgba(76,175,80,0.25);">
+        <div class="card-header">
+          <span class="card-title" style="color:#81c784;">Your Active Deals</span>
+          <span class="badge badge-green">2 Active</span>
+        </div>
+        <div class="deal-row">
+          <div class="deal-icon" style="background:rgba(229,57,53,0.15);">🎸</div>
+          <div style="flex:1;">
+            <div class="deal-name">D'Addario Strings</div>
+            <div class="deal-meta">Artist Endorsement · Renewed Jun 2026</div>
+          </div>
+          <div class="deal-value">$600/yr free strings</div>
+        </div>
+        <div class="deal-row" style="border-bottom:none;">
+          <div class="deal-icon" style="background:rgba(33,150,243,0.15);">🎤</div>
+          <div style="flex:1;">
+            <div class="deal-name">Shure Microphones</div>
+            <div class="deal-meta">Gear Loan · 2 x SM58 + 1 x Beta 87A</div>
+          </div>
+          <div class="deal-value">Gear on loan</div>
+        </div>
+      </div>
+
+      <!-- Sponsor cards -->
+      <div class="section-heading mb-20">
+        <h2>Endorsement Opportunities</h2>
+        <p>Brands actively seeking touring artists · Apply directly</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo">
+            <div class="sponsor-logo-icon" style="background:rgba(229,57,53,0.12);">🎸</div>
+            <div><div class="sponsor-name">Guitar Center</div><div class="sponsor-tagline">America's largest music retailer</div></div>
+          </div>
+          <div class="sponsor-desc">Guitar Center's Artist Program gives touring musicians gear credit, in-store support at 300+ locations, and promotional opportunities through their social channels.</div>
+          <div class="sponsor-perks">
+            <div class="perk-item">$500–2,000 annual gear credit</div>
+            <div class="perk-item">Priority service at any GC location</div>
+            <div class="perk-item">GC Artist social feature</div>
+            <div class="perk-item">Loaner gear program for tours</div>
+          </div>
+          <div class="tags"><span class="tag">Guitars</span><span class="tag">Amps</span><span class="tag">Drums</span><span class="tag">Keys</span><span class="tag">PA</span></div>
+          <div class="sponsor-footer">
+            <span class="endorsement-level badge badge-green">Open Applications</span>
+            <button class="btn btn-primary btn-sm">Apply Now</button>
+          </div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo">
+            <div class="sponsor-logo-icon" style="background:rgba(255,193,7,0.12);">🎸</div>
+            <div><div class="sponsor-name">Fender</div><div class="sponsor-tagline">Since 1946 · The sound of rock &amp; roll</div></div>
+          </div>
+          <div class="sponsor-desc">Fender's Artist Relations team works directly with touring musicians to provide instruments, support, and visibility across their global network.</div>
+          <div class="sponsor-perks">
+            <div class="perk-item">Instrument discounts (40–60% off)</div>
+            <div class="perk-item">Feature in Fender Play / social</div>
+            <div class="perk-item">Backstage gear support at festivals</div>
+            <div class="perk-item">Custom shop consultation</div>
+          </div>
+          <div class="tags"><span class="tag">Stratocaster</span><span class="tag">Telecaster</span><span class="tag">Precision Bass</span></div>
+          <div class="sponsor-footer">
+            <span class="endorsement-level badge badge-yellow">Selective</span>
+            <button class="btn btn-primary btn-sm">Connect with Rep</button>
+          </div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo">
+            <div class="sponsor-logo-icon" style="background:rgba(33,150,243,0.12);">🥁</div>
+            <div><div class="sponsor-name">Pearl Drums</div><div class="sponsor-tagline">Excellence in craftsmanship since 1946</div></div>
+          </div>
+          <div class="sponsor-desc">Pearl's Artist Program supports drummers at all career stages, from local touring artists to international stars, with gear support and promotional visibility.</div>
+          <div class="sponsor-perks">
+            <div class="perk-item">Free drum kit (mid-tier) for qualifying artists</div>
+            <div class="perk-item">Hardware and cymbal partnerships</div>
+            <div class="perk-item">Pearl logo usage for promo</div>
+            <div class="perk-item">Artist spotlight on Pearl website</div>
+          </div>
+          <div class="tags"><span class="tag">Export Series</span><span class="tag">Masters</span><span class="tag">Reference Pure</span></div>
+          <div class="sponsor-footer">
+            <span class="endorsement-level badge badge-green">Open Applications</span>
+            <button class="btn btn-primary btn-sm">Apply Now</button>
+          </div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo">
+            <div class="sponsor-logo-icon" style="background:rgba(156,39,176,0.12);">🎸</div>
+            <div><div class="sponsor-name">Ibanez</div><div class="sponsor-tagline">Precision for players who push limits</div></div>
+          </div>
+          <div class="sponsor-desc">Ibanez has long supported hard rock, metal, and progressive artists with world-class instruments. Their artist program offers deep discounts and custom options.</div>
+          <div class="sponsor-perks">
+            <div class="perk-item">50% off MSRP on all Ibanez gear</div>
+            <div class="perk-item">Signature model pathway</div>
+            <div class="perk-item">Feature in Ibanez catalog</div>
+            <div class="perk-item">Festival backline support</div>
+          </div>
+          <div class="tags"><span class="tag">RG Series</span><span class="tag">S Series</span><span class="tag">SR Bass</span></div>
+          <div class="sponsor-footer">
+            <span class="endorsement-level badge badge-yellow">Selective</span>
+            <button class="btn btn-primary btn-sm">Connect with Rep</button>
+          </div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo">
+            <div class="sponsor-logo-icon" style="background:rgba(76,175,80,0.12);">🎹</div>
+            <div><div class="sponsor-name">Yamaha Music</div><div class="sponsor-tagline">Instruments, amps, PA, and more</div></div>
+          </div>
+          <div class="sponsor-desc">Yamaha's expansive product line makes them one of the most comprehensive sponsors available — instruments, amps, PA systems, recording gear, and pianos.</div>
+          <div class="sponsor-perks">
+            <div class="perk-item">Gear loan program for touring</div>
+            <div class="perk-item">Yamaha Artist page feature</div>
+            <div class="perk-item">In-store clinics and events</div>
+            <div class="perk-item">Full PA system loans for qualifying artists</div>
+          </div>
+          <div class="tags"><span class="tag">PA Systems</span><span class="tag">Digital Pianos</span><span class="tag">Guitars</span><span class="tag">Drums</span></div>
+          <div class="sponsor-footer">
+            <span class="endorsement-level badge badge-green">Open Applications</span>
+            <button class="btn btn-primary btn-sm">Apply Now</button>
+          </div>
+        </div>
+
+        <div class="sponsor-card">
+          <div class="sponsor-logo">
+            <div class="sponsor-logo-icon" style="background:rgba(255,107,53,0.12);">🎤</div>
+            <div><div class="sponsor-name">Shure</div><div class="sponsor-tagline">The world's leading microphone brand</div></div>
+          </div>
+          <div class="sponsor-desc">Shure Artist Relations supports touring vocalists and bands with microphone endorsements, stage gear loans, and prominent artist placement in marketing.</div>
+          <div class="sponsor-perks">
+            <div class="perk-item">Microphone gear loans for major tours</div>
+            <div class="perk-item">Co-branded content opportunities</div>
+            <div class="perk-item">Wireless system access</div>
+            <div class="perk-item">Tech support on the road</div>
+          </div>
+          <div class="tags"><span class="tag">SM58</span><span class="tag">Beta 87A</span><span class="tag">Wireless</span><span class="tag">IEM</span></div>
+          <div class="sponsor-footer">
+            <span class="endorsement-level badge badge-blue">By Referral</span>
+            <button class="btn btn-outline btn-sm">Request Intro</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+</body>
+</html>

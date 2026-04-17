@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Wheels & Transport</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .vehicle-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .vehicle-card:hover { border-color: rgba(229,57,53,0.3); }
+
+    .vehicle-img {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      background: var(--card2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .vehicle-body { padding: 16px 18px; }
+    .vehicle-name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .vehicle-type { font-size: .78rem; color: var(--muted); margin-bottom: 10px; }
+
+    .vehicle-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .spec-item { font-size: .75rem; color: var(--muted); }
+    .spec-item strong { color: var(--text); }
+
+    .vehicle-footer {
+      padding: 12px 18px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+
+    .vehicle-price { font-size: 1rem; font-weight: 800; color: #fff; }
+    .vehicle-price-label { font-size: .7rem; color: var(--muted); }
+
+    /* Driver card */
+    .driver-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color 0.15s;
+    }
+    .driver-card:hover { border-color: rgba(229,57,53,0.25); }
+
+    .driver-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .driver-name { font-size: .95rem; font-weight: 700; color: #fff; }
+    .driver-sub { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+    .driver-stats {
+      display: flex;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .dstat { font-size: .75rem; color: var(--muted); }
+    .dstat strong { color: var(--text); }
+
+    /* Alert banner */
+    .road-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      margin-bottom: 8px;
+      font-size: .8rem;
+    }
+    .road-alert-icon { font-size: .95rem; flex-shrink: 0; margin-top: 1px; }
+    .road-alert strong { display: block; margin-bottom: 2px; }
+
+    .alert-red { background: rgba(229,57,53,0.08); border: 1px solid rgba(229,57,53,0.2); color: var(--text); }
+    .alert-yellow { background: rgba(255,193,7,0.07); border: 1px solid rgba(255,193,7,0.2); color: var(--text); }
+    .alert-blue { background: rgba(33,150,243,0.07); border: 1px solid rgba(33,150,243,0.2); color: var(--text); }
+    .alert-green { background: rgba(76,175,80,0.07); border: 1px solid rgba(76,175,80,0.2); color: var(--text); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Connect</div>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="photographers.html" class="nav-item"><span class="nav-icon">📷</span> Photographers</a>
+      <a href="sponsors.html" class="nav-item"><span class="nav-icon">🤝</span> Sponsors</a>
+      <a href="reviews.html" class="nav-item"><span class="nav-icon">⭐</span> Reviews</a>
+      <div class="nav-section-label">Road Life</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="wheels.html" class="nav-item active"><span class="nav-icon">🚐</span> Wheels</a>
+      <a href="leisure.html" class="nav-item"><span class="nav-icon">🎉</span> Leisure</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div><div class="profile-name">Rust &amp; Chrome</div><div class="profile-role">Southern Rock · Memphis, TN</div></div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Wheels &amp; Transport</h1>
+        <p>Vans, RVs, tour buses, and drivers — Nashville, TN</p>
+      </div>
+      <div class="topbar-right">
+        <a href="profile.html" class="avatar">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;">
+        <div>
+
+          <!-- Vehicles -->
+          <div class="section-heading mb-20">
+            <h2>Available Vehicles</h2>
+            <p>Rentals near Nashville · Verified listings</p>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="vTypeBar">
+            <div class="badge badge-red" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setVType('all',this)">All</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setVType('van',this)">🚐 Vans</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setVType('rv',this)">🚌 RVs</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setVType('bus',this)">🚎 Tour Buses</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:32px;" id="vehicleGrid">
+
+            <div class="vehicle-card" data-vtype="van">
+              <div class="vehicle-img">🚐</div>
+              <div class="vehicle-body">
+                <div class="vehicle-name">Ford Transit 350 XL</div>
+                <div class="vehicle-type">12-Passenger Cargo Van</div>
+                <div class="vehicle-specs">
+                  <div class="spec-item">Seats: <strong>12</strong></div>
+                  <div class="spec-item">Cargo: <strong>280 cu ft</strong></div>
+                  <div class="spec-item">MPG: <strong>18 city</strong></div>
+                  <div class="spec-item">Drive: <strong>Standard</strong></div>
+                </div>
+                <div class="tags">
+                  <span class="tag">Gear Friendly</span><span class="tag">Hitch</span><span class="tag">Bluetooth</span>
+                </div>
+              </div>
+              <div class="vehicle-footer">
+                <div><div class="vehicle-price">$129<span style="font-size:.75rem;font-weight:400;color:var(--muted);">/day</span></div><div class="vehicle-price-label">0.8 mi away · Available now</div></div>
+                <button class="btn btn-primary btn-sm">Book</button>
+              </div>
+            </div>
+
+            <div class="vehicle-card" data-vtype="van">
+              <div class="vehicle-img">🚐</div>
+              <div class="vehicle-body">
+                <div class="vehicle-name">Mercedes Sprinter 2500</div>
+                <div class="vehicle-type">High-Roof Cargo Van</div>
+                <div class="vehicle-specs">
+                  <div class="spec-item">Seats: <strong>8</strong></div>
+                  <div class="spec-item">Cargo: <strong>320 cu ft</strong></div>
+                  <div class="spec-item">MPG: <strong>22 hwy</strong></div>
+                  <div class="spec-item">Drive: <strong>Standard</strong></div>
+                </div>
+                <div class="tags">
+                  <span class="tag">High Roof</span><span class="tag">Liftgate</span><span class="tag">Custom Racking</span>
+                </div>
+              </div>
+              <div class="vehicle-footer">
+                <div><div class="vehicle-price">$155<span style="font-size:.75rem;font-weight:400;color:var(--muted);">/day</span></div><div class="vehicle-price-label">2.1 mi away · Available now</div></div>
+                <button class="btn btn-primary btn-sm">Book</button>
+              </div>
+            </div>
+
+            <div class="vehicle-card" data-vtype="rv">
+              <div class="vehicle-img">🚌</div>
+              <div class="vehicle-body">
+                <div class="vehicle-name">Winnebago View 24D</div>
+                <div class="vehicle-type">Class C RV — Sleeps 4</div>
+                <div class="vehicle-specs">
+                  <div class="spec-item">Sleeps: <strong>4</strong></div>
+                  <div class="spec-item">Length: <strong>24 ft</strong></div>
+                  <div class="spec-item">Generator: <strong>Yes</strong></div>
+                  <div class="spec-item">Drive: <strong>CDL Not Req.</strong></div>
+                </div>
+                <div class="tags">
+                  <span class="tag">Kitchen</span><span class="tag">AC</span><span class="tag">Shower</span>
+                </div>
+              </div>
+              <div class="vehicle-footer">
+                <div><div class="vehicle-price">$249<span style="font-size:.75rem;font-weight:400;color:var(--muted);">/day</span></div><div class="vehicle-price-label">4.3 mi away · Available Jun 16</div></div>
+                <button class="btn btn-primary btn-sm">Book</button>
+              </div>
+            </div>
+
+            <div class="vehicle-card" data-vtype="rv">
+              <div class="vehicle-img">🚌</div>
+              <div class="vehicle-body">
+                <div class="vehicle-name">Thor Motor Coach Axis</div>
+                <div class="vehicle-type">Class A RV — Sleeps 6</div>
+                <div class="vehicle-specs">
+                  <div class="spec-item">Sleeps: <strong>6</strong></div>
+                  <div class="spec-item">Length: <strong>30 ft</strong></div>
+                  <div class="spec-item">Generator: <strong>Yes</strong></div>
+                  <div class="spec-item">Drive: <strong>CDL Not Req.</strong></div>
+                </div>
+                <div class="tags">
+                  <span class="tag">Slide-Out</span><span class="tag">Full Kitchen</span><span class="tag">Washer/Dryer</span>
+                </div>
+              </div>
+              <div class="vehicle-footer">
+                <div><div class="vehicle-price">$329<span style="font-size:.75rem;font-weight:400;color:var(--muted);">/day</span></div><div class="vehicle-price-label">6.0 mi away · Available now</div></div>
+                <button class="btn btn-primary btn-sm">Book</button>
+              </div>
+            </div>
+
+            <div class="vehicle-card" data-vtype="bus">
+              <div class="vehicle-img">🚎</div>
+              <div class="vehicle-body">
+                <div class="vehicle-name">Prevost H3-45</div>
+                <div class="vehicle-type">Full Tour Bus — 12 Bunks</div>
+                <div class="vehicle-specs">
+                  <div class="spec-item">Bunks: <strong>12</strong></div>
+                  <div class="spec-item">Lounge: <strong>Front &amp; Rear</strong></div>
+                  <div class="spec-item">Driver: <strong>Included</strong></div>
+                  <div class="spec-item">Generator: <strong>1000W</strong></div>
+                </div>
+                <div class="tags">
+                  <span class="tag">Driver Included</span><span class="tag">WiFi</span><span class="tag">TV/AV</span>
+                </div>
+              </div>
+              <div class="vehicle-footer">
+                <div><div class="vehicle-price">$1,200<span style="font-size:.75rem;font-weight:400;color:var(--muted);">/day</span></div><div class="vehicle-price-label">Driver included · 3-day min</div></div>
+                <button class="btn btn-primary btn-sm">Inquire</button>
+              </div>
+            </div>
+
+            <div class="vehicle-card" data-vtype="bus">
+              <div class="vehicle-img">🚎</div>
+              <div class="vehicle-body">
+                <div class="vehicle-name">MCI J4500 Limo Coach</div>
+                <div class="vehicle-type">Luxury Sleeper — 10 Bunks</div>
+                <div class="vehicle-specs">
+                  <div class="spec-item">Bunks: <strong>10</strong></div>
+                  <div class="spec-item">Lounge: <strong>Front only</strong></div>
+                  <div class="spec-item">Driver: <strong>Included</strong></div>
+                  <div class="spec-item">Wi-Fi: <strong>Starlink</strong></div>
+                </div>
+                <div class="tags">
+                  <span class="tag">Luxury</span><span class="tag">Starlink WiFi</span><span class="tag">Bose Audio</span>
+                </div>
+              </div>
+              <div class="vehicle-footer">
+                <div><div class="vehicle-price">$1,450<span style="font-size:.75rem;font-weight:400;color:var(--muted);">/day</span></div><div class="vehicle-price-label">Driver included · 5-day min</div></div>
+                <button class="btn btn-primary btn-sm">Inquire</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drivers -->
+          <div class="section-heading mb-20">
+            <h2>Available Drivers</h2>
+            <p>Vetted CDL drivers who know the touring life</p>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+
+            <div class="driver-card">
+              <div class="driver-avatar" style="background:linear-gradient(135deg,#e53935,#ff6b35);">RD</div>
+              <div style="flex:1;">
+                <div class="driver-name">Ray Donaldson</div>
+                <div class="driver-sub">CDL-A · 15 yrs tour experience · Nashville, TN</div>
+                <div class="driver-stats">
+                  <div class="dstat">⭐ <strong>4.9</strong> (62 tours)</div>
+                  <div class="dstat">🚐 <strong>Van / Bus</strong></div>
+                  <div class="dstat">💵 <strong>$350/day</strong></div>
+                  <div class="dstat">📍 <strong>0.9 mi</strong></div>
+                </div>
+                <div class="tags mt-8"><span class="tag">CDL-A</span><span class="tag">Hazmat</span><span class="tag">Overnight Drives</span><span class="tag">Security</span></div>
+              </div>
+              <button class="btn btn-primary btn-sm">Hire</button>
+            </div>
+
+            <div class="driver-card">
+              <div class="driver-avatar" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">TW</div>
+              <div style="flex:1;">
+                <div class="driver-name">Tanya Williams</div>
+                <div class="driver-sub">CDL-B · 8 yrs · Nashville, TN</div>
+                <div class="driver-stats">
+                  <div class="dstat">⭐ <strong>5.0</strong> (38 tours)</div>
+                  <div class="dstat">🚐 <strong>Van / RV</strong></div>
+                  <div class="dstat">💵 <strong>$290/day</strong></div>
+                  <div class="dstat">📍 <strong>3.2 mi</strong></div>
+                </div>
+                <div class="tags mt-8"><span class="tag">CDL-B</span><span class="tag">RV Certified</span><span class="tag">Route Planning</span></div>
+              </div>
+              <button class="btn btn-primary btn-sm">Hire</button>
+            </div>
+
+            <div class="driver-card">
+              <div class="driver-avatar" style="background:linear-gradient(135deg,#2e7d32,#66bb6a);">MK</div>
+              <div style="flex:1;">
+                <div class="driver-name">Marcus King</div>
+                <div class="driver-sub">CDL-A · 20 yrs · Former Prevost driver</div>
+                <div class="driver-stats">
+                  <div class="dstat">⭐ <strong>4.8</strong> (94 tours)</div>
+                  <div class="dstat">🚎 <strong>Tour Bus</strong></div>
+                  <div class="dstat">💵 <strong>$425/day</strong></div>
+                  <div class="dstat">📍 <strong>5.1 mi</strong></div>
+                </div>
+                <div class="tags mt-8"><span class="tag">CDL-A</span><span class="tag">Tour Bus Expert</span><span class="tag">Overnight</span><span class="tag">Int'l License</span></div>
+              </div>
+              <button class="btn btn-primary btn-sm">Hire</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: Road Alerts -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:84px;">
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🚨 Road Alerts</span>
+              <span class="badge badge-red">Live</span>
+            </div>
+            <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Nashville area · Crowdsourced by touring musicians</p>
+
+            <div class="road-alert alert-red">
+              <span class="road-alert-icon">⚠️</span>
+              <div><strong>Speed Trap — I-24 East, MM 54</strong>State troopers running laser radar. Heavy enforcement 8 AM–6 PM. Spotted today by 3 drivers.</div>
+            </div>
+
+            <div class="road-alert alert-yellow">
+              <span class="road-alert-icon">🚧</span>
+              <div><strong>Construction — I-65 South, MM 72–80</strong>Lane closure through end of June. Add 25–35 min during peak hours.</div>
+            </div>
+
+            <div class="road-alert alert-blue">
+              <span class="road-alert-icon">⚖️</span>
+              <div><strong>Weigh Station — I-40 West, MM 201</strong>Open and active. If you're in a Class A or loaded bus, budget time for inspection.</div>
+            </div>
+
+            <div class="road-alert alert-yellow">
+              <span class="road-alert-icon">🚓</span>
+              <div><strong>Police Checkpoint — US-70 near White Bluff</strong>Late-night DUI checkpoint reported Fri–Sat nights. Noted by community.</div>
+            </div>
+
+            <div class="road-alert alert-green">
+              <span class="road-alert-icon">✅</span>
+              <div><strong>I-65 North to Louisville — Clear</strong>No issues reported. Avg speed 72 mph. Smooth all the way to KY border.</div>
+            </div>
+
+            <button class="btn btn-ghost btn-sm mt-12" style="width:100%;">+ Report an Alert</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">⛽ Gas Nearby</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;">
+                <span style="color:var(--text);">Shell — Elliston Pl</span>
+                <div style="text-align:right;"><div style="color:#ffd54f;font-weight:700;">$3.09</div><div style="font-size:.68rem;color:var(--muted);">0.4 mi</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;">
+                <span style="color:var(--text);">Pilot — I-40, Exit 204</span>
+                <div style="text-align:right;"><div style="color:#ffd54f;font-weight:700;">$3.05</div><div style="font-size:.68rem;color:var(--muted);">3.1 mi</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;">
+                <span style="color:var(--text);">Love's Travel Stop</span>
+                <div style="text-align:right;"><div style="color:#ffd54f;font-weight:700;">$3.03</div><div style="font-size:.68rem;color:var(--muted);">6.4 mi · Diesel avail.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">📋 Route Tips</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:.78rem;color:var(--muted);">
+              <div>🛣️ <strong style="color:var(--text);">I-65 South → Atlanta:</strong> Best departure window 5–7 AM to beat Birmingham traffic.</div>
+              <div>🚧 <strong style="color:var(--text);">Avoid I-24 East Fri PM:</strong> Gridlock from MM 55–80 during rush hour.</div>
+              <div>⛽ <strong style="color:var(--text);">Fill up before I-75:</strong> Prices jump $0.20/gal past Chattanooga city limits.</div>
+              <div>🚦 <strong style="color:var(--text);">US-31 through Franklin:</strong> Good alternate route — 30 mph zones, watch speed.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  function setVType(type, el) {
+    document.querySelectorAll('#vTypeBar .badge').forEach(b => { b.className = 'badge badge-gray'; b.style.cursor='pointer'; b.style.padding='6px 14px'; b.style.fontSize='.78rem'; });
+    el.className = 'badge badge-red';
+    el.style.cursor='pointer'; el.style.padding='6px 14px'; el.style.fontSize='.78rem';
+    document.querySelectorAll('.vehicle-card').forEach(c => {
+      c.style.display = (type === 'all' || c.dataset.vtype === type) ? 'block' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

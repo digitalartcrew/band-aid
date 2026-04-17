@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Leisure & Days Off</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .leisure-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .leisure-card:hover { border-color: rgba(229,57,53,0.25); }
+
+    .leisure-img {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .leisure-body { padding: 14px 16px; }
+    .leisure-name { font-size: .95rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .leisure-cat { font-size: .72rem; color: var(--muted); margin-bottom: 8px; }
+    .leisure-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; }
+
+    .leisure-footer {
+      padding: 10px 16px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+    }
+
+    .leisure-meta { font-size: .72rem; color: var(--muted); }
+    .leisure-meta strong { color: var(--text); }
+
+    /* Event row */
+    .event-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .event-row:last-child { border-bottom: none; }
+
+    .event-date-box {
+      width: 42px;
+      height: 46px;
+      border-radius: 8px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .event-month { font-size: .58rem; text-transform: uppercase; color: var(--red); font-weight: 700; }
+    .event-day { font-size: 1.05rem; font-weight: 800; color: #fff; line-height: 1; }
+
+    .event-name { font-size: .875rem; font-weight: 600; color: #fff; }
+    .event-detail { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+
+    /* Music history site */
+    .history-card {
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1025 100%);
+      border: 1px solid rgba(156,39,176,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .history-icon { font-size: 1.4rem; margin-bottom: 6px; }
+    .history-name { font-size: .9rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .history-desc { font-size: .78rem; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Connect</div>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="photographers.html" class="nav-item"><span class="nav-icon">📷</span> Photographers</a>
+      <a href="sponsors.html" class="nav-item"><span class="nav-icon">🤝</span> Sponsors</a>
+      <a href="reviews.html" class="nav-item"><span class="nav-icon">⭐</span> Reviews</a>
+      <div class="nav-section-label">Road Life</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="wheels.html" class="nav-item"><span class="nav-icon">🚐</span> Wheels</a>
+      <a href="leisure.html" class="nav-item active"><span class="nav-icon">🎉</span> Leisure</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div><div class="profile-name">Rust &amp; Chrome</div><div class="profile-role">Southern Rock · Memphis, TN</div></div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Leisure &amp; Days Off</h1>
+        <p>Nashville, TN · Day off Jun 16 — make the most of it</p>
+      </div>
+      <div class="topbar-right">
+        <a href="profile.html" class="avatar">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- Day off banner -->
+      <div style="background:linear-gradient(135deg,#0a1a0a,#152515);border:1px solid rgba(76,175,80,0.25);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+        <div>
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:#81c784;font-weight:700;margin-bottom:4px;">Tomorrow — Day Off</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#fff;">No show Jun 16 · Nashville, TN</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,0.5);">Next up: Atlanta, GA — Jun 17 · The Masquerade</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <a href="stores.html" class="btn btn-ghost btn-sm">Find Food</a>
+          <a href="map.html" class="btn btn-primary btn-sm">Explore Map</a>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;">
+        <div>
+
+          <!-- Filter -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;" id="leisureBar">
+            <div class="badge badge-red" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setLeisure('all',this)">All</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setLeisure('music',this)">🎵 Music</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setLeisure('food',this)">🍕 Food</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setLeisure('outdoor',this)">🌿 Outdoors</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setLeisure('culture',this)">🏛️ Culture</div>
+            <div class="badge badge-gray" style="cursor:pointer;padding:6px 14px;font-size:.78rem;" onclick="setLeisure('night',this)">🌙 Nightlife</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:32px;" id="leisureGrid">
+
+            <div class="leisure-card" data-lcat="music">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#1a0a1a,#2d1040);">🎸</div>
+              <div class="leisure-body">
+                <div class="leisure-name">Country Music Hall of Fame</div>
+                <div class="leisure-cat">🎵 Music History</div>
+                <div class="leisure-desc">World-class collection of country and American music history. Artifacts, costumes, instruments, and studios.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>0.9 mi</strong> · $29/adult · Opens 9 AM</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="music">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#1a0f0a,#2d1a05);">🎙</div>
+              <div class="leisure-body">
+                <div class="leisure-name">RCA Studio B Tour</div>
+                <div class="leisure-cat">🎵 Recording History</div>
+                <div class="leisure-desc">Where Elvis, Dolly Parton, and Roy Orbison recorded. 45-min guided tour of the historic studio.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>1.4 mi</strong> · $20/adult · Tours daily</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="food">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#1a0a0a,#2d1010);">🍗</div>
+              <div class="leisure-body">
+                <div class="leisure-name">Hattie B's Hot Chicken</div>
+                <div class="leisure-cat">🍕 Must-Try Eats</div>
+                <div class="leisure-desc">The Nashville original. Order "Shut the Cluck Up" heat level if you dare. Long line — worth it.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>0.3 mi</strong> · $12–20 · ★★★★★</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="food">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#0f150a,#1a2610);">🥩</div>
+              <div class="leisure-body">
+                <div class="leisure-name">Arnold's Country Kitchen</div>
+                <div class="leisure-cat">🍕 Legendary Meat-n-Three</div>
+                <div class="leisure-desc">Cash only. Plate lunches, cornbread, and sweet tea. Regulars include every Nashville musician ever.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>1.2 mi</strong> · $11 plate · Closes 2:30 PM</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="outdoor">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#0a1a0a,#0f2b10);">🌿</div>
+              <div class="leisure-body">
+                <div class="leisure-name">Radnor Lake State Park</div>
+                <div class="leisure-cat">🌿 Hiking / Nature</div>
+                <div class="leisure-desc">6+ miles of hiking trails. Wildlife, lake views, and no cell signal — perfect mental reset between shows.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>8.4 mi</strong> · Free · Opens at sunrise</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="culture">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#0a0f1a,#10182d);">🏛️</div>
+              <div class="leisure-body">
+                <div class="leisure-name">The Parthenon</div>
+                <div class="leisure-cat">🏛️ Art &amp; Architecture</div>
+                <div class="leisure-desc">Full-scale replica of the Athens Parthenon. Inside: the Cowan Collection of American paintings. Surreal landmark.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>1.0 mi</strong> · $6/adult · Closes 4:30 PM</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="night">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#1a0a10,#2d0f1a);">🌙</div>
+              <div class="leisure-body">
+                <div class="leisure-name">Robert's Western World</div>
+                <div class="leisure-cat">🌙 Honky-Tonk Nightlife</div>
+                <div class="leisure-desc">Free live music, cheap beers, and the best Recession Special (hot dog, PBR, chips) in town. No cover.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>2.3 mi</strong> · Free entry · 11 AM–3 AM</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+            <div class="leisure-card" data-lcat="outdoor">
+              <div class="leisure-img" style="background:linear-gradient(135deg,#0a1510,#0f251a);">🎾</div>
+              <div class="leisure-body">
+                <div class="leisure-name">Shelby Bottoms Greenway</div>
+                <div class="leisure-cat">🌿 Walking / Biking</div>
+                <div class="leisure-desc">Paved trails along the Cumberland River. Rent a bike at the trailhead. Good way to decompress before load-in.</div>
+              </div>
+              <div class="leisure-footer">
+                <div class="leisure-meta"><strong>4.2 mi</strong> · Free · Open daily</div>
+                <a href="map.html" class="btn btn-ghost btn-xs">Map</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: Events + Music History -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:84px;">
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">📅 Events Tonight</span><span class="card-action">View all</span></div>
+
+            <div class="event-row">
+              <div class="event-date-box"><div class="event-month">Jun</div><div class="event-day">16</div></div>
+              <div>
+                <div class="event-name">Ryman Auditorium — Bluegrass Night</div>
+                <div class="event-detail">7:30 PM · $35–85 · 0.8 mi</div>
+              </div>
+            </div>
+            <div class="event-row">
+              <div class="event-date-box"><div class="event-month">Jun</div><div class="event-day">16</div></div>
+              <div>
+                <div class="event-name">Nashville Jazz Workshop</div>
+                <div class="event-detail">8 PM · $15 · 2.1 mi</div>
+              </div>
+            </div>
+            <div class="event-row">
+              <div class="event-date-box"><div class="event-month">Jun</div><div class="event-day">16</div></div>
+              <div>
+                <div class="event-name">Bluebird Cafe — Songwriters Night</div>
+                <div class="event-detail">9 PM · $15 · 4.4 mi</div>
+              </div>
+            </div>
+            <div class="event-row" style="border-bottom:none;">
+              <div class="event-date-box"><div class="event-month">Jun</div><div class="event-day">16</div></div>
+              <div>
+                <div class="event-name">Music City Center — Vintage Guitar Show</div>
+                <div class="event-detail">10 AM–5 PM · Free · 1.2 mi</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title" style="color:rgba(206,147,216,1);">🎵 Music History Sites</span></div>
+            <div class="history-card">
+              <div class="history-icon">🎸</div>
+              <div class="history-name">Printer's Alley</div>
+              <div class="history-desc">Historic nightclub row where the Ink Spots and other jazz icons played in the 40s–60s. Still active today.</div>
+            </div>
+            <div class="history-card">
+              <div class="history-icon">🎙</div>
+              <div class="history-name">WSM Radio — 650 AM</div>
+              <div class="history-desc">Home of the Grand Ole Opry since 1925. Studio tours available. Living country music history.</div>
+            </div>
+            <div class="history-card" style="margin-bottom:0;">
+              <div class="history-icon">📻</div>
+              <div class="history-name">Bradley's Barn</div>
+              <div class="history-desc">Where the Nashville Sound was born. Owen and Harold Bradley recorded Elvis, Patsy Cline, and more.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">💡 Local Tip</span></div>
+            <div style="font-size:.82rem;color:var(--muted);line-height:1.6;">
+              🤫 <strong style="color:var(--text);">Bands in the know:</strong> The Station Inn on Gideon's Way has free bluegrass most nights starting at 9 PM. No cover, BYOB, and some of the best picking in town. Go early for a table.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  function setLeisure(cat, el) {
+    document.querySelectorAll('#leisureBar .badge').forEach(b => { b.className = 'badge badge-gray'; b.style.cssText = 'cursor:pointer;padding:6px 14px;font-size:.78rem;'; });
+    el.className = 'badge badge-red';
+    el.style.cssText = 'cursor:pointer;padding:6px 14px;font-size:.78rem;';
+    document.querySelectorAll('.leisure-card').forEach(c => {
+      c.style.display = (cat === 'all' || c.dataset.lcat === cat) ? 'block' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
