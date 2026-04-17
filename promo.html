@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Promo Tools</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .promo-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: border-color 0.15s;
+    }
+
+    .promo-card:hover { border-color: rgba(229,57,53,0.25); }
+
+    .promo-card-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .promo-card-title { font-size: .975rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .promo-card-desc { font-size: .8rem; color: var(--muted); line-height: 1.5; margin-bottom: 14px; }
+
+    /* Social post preview */
+    .post-preview {
+      background: var(--darker);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: .82rem;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .platform-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .platform-tab {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: var(--card2);
+      color: var(--muted);
+      transition: all 0.12s;
+    }
+
+    .platform-tab.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    /* Contact row */
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .contact-row:last-child { border-bottom: none; }
+
+    .contact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      flex-shrink: 0;
+    }
+
+    .contact-body { flex: 1; min-width: 0; }
+    .contact-name { font-size: .875rem; font-weight: 600; color: #fff; }
+    .contact-meta { font-size: .72rem; color: var(--muted); margin-top: 1px; }
+
+    .copy-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .72rem;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .copy-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+    .copy-btn.copied { background: rgba(76,175,80,0.15); color: #81c784; border-color: rgba(76,175,80,0.3); }
+
+    /* Checklist */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .82rem;
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+
+    .checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 2px solid var(--border2);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s;
+      margin-top: 1px;
+    }
+
+    .checkbox.checked {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+      font-size: .65rem;
+    }
+
+    .check-text { color: var(--text); flex: 1; line-height: 1.4; }
+    .check-text.done { text-decoration: line-through; color: var(--muted2); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="promo.html" class="nav-item active"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Promo Tools</h1>
+        <p>Nashville, TN · Tonight — Exit/In · 9 PM</p>
+      </div>
+      <div class="topbar-right">
+        <a href="profile.html" class="avatar">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+        <!-- LEFT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Social post generator -->
+          <div class="promo-card">
+            <div class="promo-card-icon">✍️</div>
+            <div class="promo-card-title">Social Post Generator</div>
+            <div class="promo-card-desc">Auto-generates show posts from your tour data. Copy and paste straight to your socials.</div>
+
+            <div class="platform-tabs" id="platformTabs">
+              <div class="platform-tab active" onclick="switchPlatform('instagram',this)">Instagram</div>
+              <div class="platform-tab" onclick="switchPlatform('twitter',this)">X / Twitter</div>
+              <div class="platform-tab" onclick="switchPlatform('facebook',this)">Facebook</div>
+            </div>
+
+            <div class="post-preview" id="postPreview">🎸 TONIGHT — Nashville, TN
+
+We're hitting the stage at @ExitIn (2208 Elliston Pl) tonight at 9 PM. Come catch us live — 21+ show, doors at 8.
+
+This is stop 8 of our Summer 2026 tour and Nashville always goes OFF. 🔥
+
+🎟 Tickets at the door · $12 advance
+📍 2208 Elliston Place, Nashville TN
+
+#RustandChrome #NashvilleLive #SouthernRock #LiveMusic #Touring</div>
+
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm" onclick="regeneratePost()">↺ Regenerate</button>
+              <button class="btn btn-primary btn-sm" id="copyPostBtn" onclick="copyPost()">Copy Post</button>
+            </div>
+          </div>
+
+          <!-- Local media contacts -->
+          <div class="promo-card">
+            <div class="promo-card-icon">📻</div>
+            <div class="promo-card-title">Local Radio &amp; Blogs</div>
+            <div class="promo-card-desc">Press contacts near Nashville that cover live music. Reach out before your show for coverage.</div>
+
+            <div class="contact-row">
+              <div class="contact-icon" style="background:rgba(229,57,53,0.12);">📻</div>
+              <div class="contact-body">
+                <div class="contact-name">WRLT Lightning 100</div>
+                <div class="contact-meta">Nashville's indie/rock station · 100.1 FM</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'music@lightning100.com')">Copy Email</button>
+            </div>
+
+            <div class="contact-row">
+              <div class="contact-icon" style="background:rgba(33,150,243,0.12);">📰</div>
+              <div class="contact-body">
+                <div class="contact-name">Nashville Scene</div>
+                <div class="contact-meta">Alt-weekly · Music listings + reviews</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'listings@nashvillescene.com')">Copy Email</button>
+            </div>
+
+            <div class="contact-row">
+              <div class="contact-icon" style="background:rgba(156,39,176,0.12);">🎙</div>
+              <div class="contact-body">
+                <div class="contact-name">Tennessean Music</div>
+                <div class="contact-meta">Music section · Weekend picks</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'music@tennessean.com')">Copy Email</button>
+            </div>
+
+            <div class="contact-row">
+              <div class="contact-icon" style="background:rgba(255,107,53,0.12);">✍️</div>
+              <div class="contact-body">
+                <div class="contact-name">The Boot</div>
+                <div class="contact-meta">Country / roots music blog · National reach</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'tips@theboot.com')">Copy Email</button>
+            </div>
+
+            <div class="contact-row" style="border-bottom:none;">
+              <div class="contact-icon" style="background:rgba(76,175,80,0.12);">📸</div>
+              <div class="contact-body">
+                <div class="contact-name">Nashville Music Guide</div>
+                <div class="contact-meta">Local events blog · High local traffic</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'hello@nashvillemusicguide.com')">Copy Email</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Promo checklist -->
+          <div class="promo-card">
+            <div class="promo-card-icon">✅</div>
+            <div class="promo-card-title">Show Promo Checklist</div>
+            <div class="promo-card-desc">Nashville · Tonight · Exit/In</div>
+
+            <div class="checklist-item">
+              <div class="checkbox checked" onclick="toggleCheck(this)">✓</div>
+              <div class="check-text done">Post on Instagram (3 days out)</div>
+            </div>
+            <div class="checklist-item">
+              <div class="checkbox checked" onclick="toggleCheck(this)">✓</div>
+              <div class="check-text done">Submit to Nashville Scene listings</div>
+            </div>
+            <div class="checklist-item">
+              <div class="checkbox checked" onclick="toggleCheck(this)">✓</div>
+              <div class="check-text done">Update Spotify profile with tour dates</div>
+            </div>
+            <div class="checklist-item">
+              <div class="checkbox" onclick="toggleCheck(this)"></div>
+              <div class="check-text">Day-of story on Instagram (4–6 PM)</div>
+            </div>
+            <div class="checklist-item">
+              <div class="checkbox" onclick="toggleCheck(this)"></div>
+              <div class="check-text">Email WRLT Lightning 100 for shoutout</div>
+            </div>
+            <div class="checklist-item">
+              <div class="checkbox" onclick="toggleCheck(this)"></div>
+              <div class="check-text">Post in Nashville music Facebook groups</div>
+            </div>
+            <div class="checklist-item">
+              <div class="checkbox" onclick="toggleCheck(this)"></div>
+              <div class="check-text">Tag venue in all posts</div>
+            </div>
+            <div class="checklist-item" style="border-bottom:none;">
+              <div class="checkbox" onclick="toggleCheck(this)"></div>
+              <div class="check-text">Post post-show clip to stories</div>
+            </div>
+          </div>
+
+          <!-- Spotify pitch -->
+          <div class="promo-card">
+            <div class="promo-card-icon">🎵</div>
+            <div class="promo-card-title">Spotify Playlist Pitching</div>
+            <div class="promo-card-desc">BandAid found Nashville-focused Spotify curators who accept Southern Rock submissions.</div>
+
+            <div class="contact-row">
+              <div class="contact-icon" style="background:rgba(30,215,96,0.12);">🎵</div>
+              <div class="contact-body">
+                <div class="contact-name">Nashville Roots &amp; Rock</div>
+                <div class="contact-meta">12.4k followers · Southern / Americana</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'curator@nashvilleroots.com')">Pitch</button>
+            </div>
+
+            <div class="contact-row">
+              <div class="contact-icon" style="background:rgba(30,215,96,0.12);">🎵</div>
+              <div class="contact-body">
+                <div class="contact-name">Southern Rock Revue</div>
+                <div class="contact-meta">8.1k followers · Classic + modern SoCal rock</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'pitch@southernrockrevue.com')">Pitch</button>
+            </div>
+
+            <div class="contact-row" style="border-bottom:none;">
+              <div class="contact-icon" style="background:rgba(30,215,96,0.12);">🎵</div>
+              <div class="contact-body">
+                <div class="contact-name">Americana Highways</div>
+                <div class="contact-meta">31k followers · Premier Americana playlist</div>
+              </div>
+              <button class="copy-btn" onclick="copyText(this, 'music@americanahighways.com')">Pitch</button>
+            </div>
+          </div>
+
+          <!-- Quick stats -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">Promo Reach This Week</span></div>
+            <div class="grid-2" style="gap:10px;">
+              <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
+                <div style="font-size:1.3rem;font-weight:800;color:#fff;">2,840</div>
+                <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Instagram Reach</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
+                <div style="font-size:1.3rem;font-weight:800;color:#fff;">418</div>
+                <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Story Views</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
+                <div style="font-size:1.3rem;font-weight:800;color:var(--green);">+94</div>
+                <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">New Followers</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--card2);border-radius:8px;">
+                <div style="font-size:1.3rem;font-weight:800;color:#fff;">3</div>
+                <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Press Mentions</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  const posts = {
+    instagram: `🎸 TONIGHT — Nashville, TN\n\nWe're hitting the stage at @ExitIn (2208 Elliston Pl) tonight at 9 PM. Come catch us live — 21+ show, doors at 8.\n\nThis is stop 8 of our Summer 2026 tour and Nashville always goes OFF. 🔥\n\n🎟 Tickets at the door · $12 advance\n📍 2208 Elliston Place, Nashville TN\n\n#RustandChrome #NashvilleLive #SouthernRock #LiveMusic #Touring`,
+    twitter: `🎸 TONIGHT Nashville — we're at @ExitIn, 9 PM. 21+ doors at 8. Stop 8 of our Summer Tour. Come out 🔥\n\n🎟 $12 at door\n📍 2208 Elliston Pl\n\n#NashvilleMusic #LiveMusic #SouthernRock`,
+    facebook: `🎸 SHOW TONIGHT in Nashville!\n\nRust & Chrome hits Exit/In tonight at 9 PM (21+). We're 8 shows into our Summer 2026 tour and bringing everything to the stage.\n\nDoors at 8 PM · $12 at the door\n2208 Elliston Place, Nashville TN\n\nBring your friends — this one's going to be loud. See you there! 🤘`
+  };
+
+  function switchPlatform(platform, el) {
+    document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('postPreview').textContent = posts[platform];
+    document.getElementById('copyPostBtn').textContent = 'Copy Post';
+    document.getElementById('copyPostBtn').classList.remove('copied');
+  }
+
+  function regeneratePost() {
+    const preview = document.getElementById('postPreview');
+    const emojis = ['🎸','🎵','🎤','🤘','🔥'];
+    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const activePlatform = document.querySelector('.platform-tab.active').textContent.toLowerCase().split('/')[0].trim();
+    const base = posts[activePlatform === 'x' ? 'twitter' : activePlatform] || posts.instagram;
+    preview.textContent = base.replace(/^[🎸🎵🎤🤘🔥]/, emoji);
+  }
+
+  function copyPost() {
+    const text = document.getElementById('postPreview').textContent;
+    navigator.clipboard.writeText(text).catch(() => {});
+    const btn = document.getElementById('copyPostBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('btn-primary');
+    setTimeout(() => { btn.textContent = 'Copy Post'; }, 2000);
+  }
+
+  function copyText(btn, text) {
+    navigator.clipboard.writeText(text).catch(() => {});
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = btn.dataset.original || 'Copy Email';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  function toggleCheck(el) {
+    const text = el.nextElementSibling;
+    if (el.classList.contains('checked')) {
+      el.classList.remove('checked');
+      el.textContent = '';
+      text.classList.remove('done');
+    } else {
+      el.classList.add('checked');
+      el.textContent = '✓';
+      text.classList.add('done');
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Local Talent</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    .artist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .artist-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+
+    .artist-card:hover { border-color: rgba(229,57,53,0.3); }
+
+    .artist-card-top {
+      padding: 18px 18px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .artist-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .artist-info { flex: 1; min-width: 0; }
+
+    .artist-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .artist-title {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .artist-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.78rem;
+      color: var(--yellow);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .artist-rating span { color: var(--muted); font-weight: 400; }
+
+    .artist-card-body {
+      padding: 0 18px 14px;
+    }
+
+    .artist-bio {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .artist-stats {
+      display: flex;
+      gap: 16px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .artist-stat { text-align: center; flex: 1; }
+    .artist-stat-val { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .artist-stat-label { font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+
+    .artist-card-footer {
+      padding: 0 18px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .artist-rate {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .artist-rate-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .avail-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Filter row */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .sort-select {
+      margin-left: auto;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--dark);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal { transform: scale(1); }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .modal-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: var(--card);
+      color: var(--muted);
+      transition: all 0.12s;
+    }
+
+    .chip:hover, .chip.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="marketplace.html" class="nav-item active"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Local Talent</h1>
+        <p>Nashville, TN · 38 musicians available</p>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" onclick="openModal('postModal')">+ Post Need</button>
+        <a href="profile.html" class="avatar">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- SEARCH + FILTERS -->
+      <div class="search-wrap mb-16">
+        <span class="search-icon">🔍</span>
+        <input class="input" type="text" placeholder="Search by name, instrument, genre…" id="searchInput" oninput="filterCards()" />
+      </div>
+
+      <div class="filter-row" id="filterRow">
+        <div class="chip active" data-inst="all" onclick="setFilter('all', this)">All</div>
+        <div class="chip" data-inst="guitar" onclick="setFilter('guitar', this)">🎸 Guitar</div>
+        <div class="chip" data-inst="bass" onclick="setFilter('bass', this)">🎵 Bass</div>
+        <div class="chip" data-inst="drums" onclick="setFilter('drums', this)">🥁 Drums</div>
+        <div class="chip" data-inst="keys" onclick="setFilter('keys', this)">🎹 Keys</div>
+        <div class="chip" data-inst="vocals" onclick="setFilter('vocals', this)">🎤 Vocals</div>
+        <div class="chip" data-inst="horns" onclick="setFilter('horns', this)">🎺 Horns</div>
+        <select class="sort-select" onchange="sortCards(this.value)">
+          <option value="dist">Sort: Distance</option>
+          <option value="rating">Sort: Rating</option>
+          <option value="rate_asc">Sort: Rate (Low)</option>
+          <option value="rate_desc">Sort: Rate (High)</option>
+        </select>
+      </div>
+
+      <!-- ARTIST GRID -->
+      <div class="artist-grid" id="artistGrid">
+
+        <!-- Marcus Johnson -->
+        <div class="artist-card" data-inst="drums" data-dist="0.8" data-rating="4.9" data-rate="250">
+          <div class="artist-card-top">
+            <div class="artist-avatar" style="background:linear-gradient(135deg,#e53935,#ff6b35);">MJ</div>
+            <div class="artist-info">
+              <div class="artist-name">Marcus Johnson</div>
+              <div class="artist-title">🥁 Drummer · Blues / Rock</div>
+              <div class="artist-rating">★★★★★ 4.9 <span>(31 shows)</span></div>
+            </div>
+            <span class="avail-badge badge badge-green">● Tonight</span>
+          </div>
+          <div class="artist-card-body">
+            <div class="artist-bio">Session drummer with 10+ years playing Nashville's circuit. Comfortable with Southern rock, blues, and Americana. Full kit available.</div>
+            <div class="tags">
+              <span class="tag">Full Kit</span>
+              <span class="tag">Southern Rock</span>
+              <span class="tag">Blues</span>
+              <span class="tag">Session Pro</span>
+            </div>
+            <div class="artist-stats">
+              <div class="artist-stat"><div class="artist-stat-val">0.8 mi</div><div class="artist-stat-label">Distance</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">31</div><div class="artist-stat-label">Shows</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">100%</div><div class="artist-stat-label">Response</div></div>
+            </div>
+          </div>
+          <div class="artist-card-footer">
+            <div>
+              <div class="artist-rate">$250</div>
+              <div class="artist-rate-label">per show</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm">View</button>
+              <button class="btn btn-primary btn-sm" onclick="openBooking('Marcus Johnson', 'Drummer')">Request</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tina Rodriguez -->
+        <div class="artist-card" data-inst="keys" data-dist="0.5" data-rating="5.0" data-rate="280">
+          <div class="artist-card-top">
+            <div class="artist-avatar" style="background:linear-gradient(135deg,#9c27b0,#e040fb);">TR</div>
+            <div class="artist-info">
+              <div class="artist-name">Tina Rodriguez</div>
+              <div class="artist-title">🎹 Keyboardist · Jazz / Soul</div>
+              <div class="artist-rating">★★★★★ 5.0 <span>(24 shows)</span></div>
+            </div>
+            <span class="avail-badge badge badge-green">● Tonight</span>
+          </div>
+          <div class="artist-card-body">
+            <div class="artist-bio">Versatile keys player trained at Belmont University. Plays everything from honky-tonk to gospel. Nord Stage 3 available.</div>
+            <div class="tags">
+              <span class="tag">Nord Stage 3</span>
+              <span class="tag">Jazz</span>
+              <span class="tag">Gospel</span>
+              <span class="tag">Sight Reading</span>
+            </div>
+            <div class="artist-stats">
+              <div class="artist-stat"><div class="artist-stat-val">0.5 mi</div><div class="artist-stat-label">Distance</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">24</div><div class="artist-stat-label">Shows</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">100%</div><div class="artist-stat-label">Response</div></div>
+            </div>
+          </div>
+          <div class="artist-card-footer">
+            <div>
+              <div class="artist-rate">$280</div>
+              <div class="artist-rate-label">per show</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm">View</button>
+              <button class="btn btn-primary btn-sm" onclick="openBooking('Tina Rodriguez', 'Keyboardist')">Request</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sarah Wells -->
+        <div class="artist-card" data-inst="bass" data-dist="1.3" data-rating="4.8" data-rate="200">
+          <div class="artist-card-top">
+            <div class="artist-avatar" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">SW</div>
+            <div class="artist-info">
+              <div class="artist-name">Sarah Wells</div>
+              <div class="artist-title">🎵 Bassist · Country / Folk</div>
+              <div class="artist-rating">★★★★½ 4.8 <span>(19 shows)</span></div>
+            </div>
+            <span class="avail-badge badge badge-green">● Tonight</span>
+          </div>
+          <div class="artist-card-body">
+            <div class="artist-bio">Fender Precision player with a deep Nashville groove. Comfortable reading charts. Own rig — Ampeg SVT head + 4×10 cab.</div>
+            <div class="tags">
+              <span class="tag">Fender P-Bass</span>
+              <span class="tag">Ampeg Rig</span>
+              <span class="tag">Country</span>
+              <span class="tag">Americana</span>
+            </div>
+            <div class="artist-stats">
+              <div class="artist-stat"><div class="artist-stat-val">1.3 mi</div><div class="artist-stat-label">Distance</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">19</div><div class="artist-stat-label">Shows</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">97%</div><div class="artist-stat-label">Response</div></div>
+            </div>
+          </div>
+          <div class="artist-card-footer">
+            <div>
+              <div class="artist-rate">$200</div>
+              <div class="artist-rate-label">per show</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm">View</button>
+              <button class="btn btn-primary btn-sm" onclick="openBooking('Sarah Wells', 'Bassist')">Request</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Devon Price -->
+        <div class="artist-card" data-inst="guitar" data-dist="2.1" data-rating="4.7" data-rate="225">
+          <div class="artist-card-top">
+            <div class="artist-avatar" style="background:linear-gradient(135deg,#2e7d32,#66bb6a);">DP</div>
+            <div class="artist-info">
+              <div class="artist-name">Devon Price</div>
+              <div class="artist-title">🎸 Lead Guitarist · Rock / Metal</div>
+              <div class="artist-rating">★★★★½ 4.7 <span>(42 shows)</span></div>
+            </div>
+            <span class="avail-badge badge badge-yellow">Tomorrow</span>
+          </div>
+          <div class="artist-card-body">
+            <div class="artist-bio">Shredder by night, session player by day. Brings a Les Paul and a Mesa Boogie half-stack. High energy stage presence.</div>
+            <div class="tags">
+              <span class="tag">Gibson Les Paul</span>
+              <span class="tag">Mesa Boogie</span>
+              <span class="tag">Rock</span>
+              <span class="tag">Metal</span>
+            </div>
+            <div class="artist-stats">
+              <div class="artist-stat"><div class="artist-stat-val">2.1 mi</div><div class="artist-stat-label">Distance</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">42</div><div class="artist-stat-label">Shows</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">93%</div><div class="artist-stat-label">Response</div></div>
+            </div>
+          </div>
+          <div class="artist-card-footer">
+            <div>
+              <div class="artist-rate">$225</div>
+              <div class="artist-rate-label">per show</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm">View</button>
+              <button class="btn btn-primary btn-sm" onclick="openBooking('Devon Price', 'Lead Guitarist')">Request</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jake Morrison -->
+        <div class="artist-card" data-inst="vocals" data-dist="1.8" data-rating="4.6" data-rate="175">
+          <div class="artist-card-top">
+            <div class="artist-avatar" style="background:linear-gradient(135deg,#e65100,#ffa726);">JM</div>
+            <div class="artist-info">
+              <div class="artist-name">Jake Morrison</div>
+              <div class="artist-title">🎤 Vocalist · Rock / Country</div>
+              <div class="artist-rating">★★★★½ 4.6 <span>(17 shows)</span></div>
+            </div>
+            <span class="avail-badge badge badge-green">● Tonight</span>
+          </div>
+          <div class="artist-card-body">
+            <div class="artist-bio">Powerful baritone with a whiskey-soaked rasp. Knows a wide catalog of classic rock and country covers. Brings his own SM58.</div>
+            <div class="tags">
+              <span class="tag">Shure SM58</span>
+              <span class="tag">Rock</span>
+              <span class="tag">Country</span>
+              <span class="tag">Baritone</span>
+            </div>
+            <div class="artist-stats">
+              <div class="artist-stat"><div class="artist-stat-val">1.8 mi</div><div class="artist-stat-label">Distance</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">17</div><div class="artist-stat-label">Shows</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">88%</div><div class="artist-stat-label">Response</div></div>
+            </div>
+          </div>
+          <div class="artist-card-footer">
+            <div>
+              <div class="artist-rate">$175</div>
+              <div class="artist-rate-label">per show</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm">View</button>
+              <button class="btn btn-primary btn-sm" onclick="openBooking('Jake Morrison', 'Vocalist')">Request</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chris Lee -->
+        <div class="artist-card" data-inst="horns" data-dist="3.2" data-rating="4.9" data-rate="220">
+          <div class="artist-card-top">
+            <div class="artist-avatar" style="background:linear-gradient(135deg,#00695c,#26a69a);">CL</div>
+            <div class="artist-info">
+              <div class="artist-name">Chris Lee</div>
+              <div class="artist-title">🎺 Trumpet · Jazz / Blues</div>
+              <div class="artist-rating">★★★★★ 4.9 <span>(28 shows)</span></div>
+            </div>
+            <span class="avail-badge badge badge-green">● Tonight</span>
+          </div>
+          <div class="artist-card-body">
+            <div class="artist-bio">Brass section veteran who's played with touring acts across the Southeast. Reads charts, improvises, and brings the heat every night.</div>
+            <div class="tags">
+              <span class="tag">Bach Stradivarius</span>
+              <span class="tag">Jazz</span>
+              <span class="tag">Blues</span>
+              <span class="tag">Charts</span>
+            </div>
+            <div class="artist-stats">
+              <div class="artist-stat"><div class="artist-stat-val">3.2 mi</div><div class="artist-stat-label">Distance</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">28</div><div class="artist-stat-label">Shows</div></div>
+              <div class="artist-stat"><div class="artist-stat-val">96%</div><div class="artist-stat-label">Response</div></div>
+            </div>
+          </div>
+          <div class="artist-card-footer">
+            <div>
+              <div class="artist-rate">$220</div>
+              <div class="artist-rate-label">per show</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm">View</button>
+              <button class="btn btn-primary btn-sm" onclick="openBooking('Chris Lee', 'Trumpet')">Request</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal" onclick="closeOnOverlay(event,'bookingModal')">
+  <div class="modal">
+    <div class="modal-title" id="bookingTitle">Request Fill-In</div>
+    <div class="modal-sub" id="bookingSubtitle">Send a booking request with your show details</div>
+
+    <div class="input-group">
+      <label class="input-label">Show Date</label>
+      <input class="input" type="date" value="2026-06-15" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Venue</label>
+      <input class="input" type="text" value="Exit/In — Nashville, TN" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Soundcheck / Load-in Time</label>
+      <input class="input" type="text" placeholder="e.g. 6:30 PM" value="6:30 PM" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Agreed Rate</label>
+      <input class="input" type="text" placeholder="$250" value="$250" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Notes for Musician</label>
+      <textarea class="input" rows="3" placeholder="Set list, genre, any special instructions…">Southern rock set — covers and originals. Bring your own sticks + hi-hat if possible.</textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="closeModal('bookingModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="flex:2;" onclick="confirmBooking()">Send Request 🎸</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST NEED MODAL -->
+<div class="modal-overlay" id="postModal" onclick="closeOnOverlay(event,'postModal')">
+  <div class="modal">
+    <div class="modal-title">Post a Need</div>
+    <div class="modal-sub">Broadcast what you're looking for to all local musicians</div>
+
+    <div class="input-group">
+      <label class="input-label">What do you need?</label>
+      <select class="input">
+        <option>Drummer (fill-in)</option>
+        <option>Bassist (fill-in)</option>
+        <option>Lead Guitarist (fill-in)</option>
+        <option>Keyboardist (fill-in)</option>
+        <option>Vocalist (fill-in)</option>
+        <option>Trumpet / Horns</option>
+        <option>Backline Gear (rental)</option>
+        <option>PA System (rental)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">When</label>
+      <input class="input" type="text" placeholder="Tonight, Jun 15 · 9 PM" value="Tonight, Jun 15 · 9 PM" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Pay</label>
+      <input class="input" type="text" placeholder="$200–$300" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Details</label>
+      <textarea class="input" rows="2" placeholder="Genre, set length, any gear you're providing…"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="closeModal('postModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="flex:2;" onclick="closeModal('postModal')">Broadcast Need 📣</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item active"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  function openBooking(name, role) {
+    document.getElementById('bookingTitle').textContent = `Request ${name}`;
+    document.getElementById('bookingSubtitle').textContent = `${role} — sending request for tonight's show`;
+    openModal('bookingModal');
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeOnOverlay(e, id) {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  }
+
+  function confirmBooking() {
+    closeModal('bookingModal');
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:12px 24px;border-radius:8px;font-size:.875rem;font-weight:600;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+    banner.textContent = '✓ Request sent! You\'ll hear back within minutes.';
+    document.body.appendChild(banner);
+    setTimeout(() => banner.remove(), 3500);
+  }
+
+  let activeInst = 'all';
+
+  function setFilter(inst, el) {
+    activeInst = inst;
+    document.querySelectorAll('#filterRow .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    filterCards();
+  }
+
+  function filterCards() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('.artist-card').forEach(card => {
+      const inst = card.dataset.inst;
+      const text = card.innerText.toLowerCase();
+      const matchInst = activeInst === 'all' || inst === activeInst;
+      const matchSearch = !query || text.includes(query);
+      card.style.display = (matchInst && matchSearch) ? 'block' : 'none';
+    });
+  }
+
+  function sortCards(val) {
+    const grid = document.getElementById('artistGrid');
+    const cards = [...grid.querySelectorAll('.artist-card')];
+    cards.sort((a, b) => {
+      if (val === 'rating') return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+      if (val === 'rate_asc') return parseFloat(a.dataset.rate) - parseFloat(b.dataset.rate);
+      if (val === 'rate_desc') return parseFloat(b.dataset.rate) - parseFloat(a.dataset.rate);
+      return parseFloat(a.dataset.dist) - parseFloat(b.dataset.dist);
+    });
+    cards.forEach(c => grid.appendChild(c));
+  }
+</script>
+</body>
+</html>

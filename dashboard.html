@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Dashboard</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Tonight card */
+    .tonight-card {
+      background: linear-gradient(135deg, #1a0a0a 0%, #2a0f0f 100%);
+      border: 1px solid rgba(229,57,53,0.35);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tonight-card::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(229,57,53,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .tonight-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+
+    .tonight-venue {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .tonight-city {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 16px;
+    }
+
+    .tonight-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tonight-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .countdown-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(229,57,53,0.2);
+      border: 1px solid rgba(229,57,53,0.4);
+      color: #ff8a80;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Quick action tiles */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .quick-tile {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .quick-tile:hover {
+      border-color: rgba(229,57,53,0.35);
+      background: var(--card2);
+    }
+
+    .quick-tile-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .quick-tile-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* Alert band */
+    .alert-band {
+      background: rgba(255,193,7,0.07);
+      border: 1px solid rgba(255,193,7,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 20px;
+    }
+
+    .alert-band-icon { font-size: 1rem; flex-shrink: 0; }
+
+    /* Nearby list row */
+    .nearby-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    .nearby-row:last-child { border-bottom: none; }
+
+    .nearby-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .nearby-body { flex: 1; min-width: 0; }
+    .nearby-name { font-size: 0.875rem; font-weight: 600; color: #fff; }
+    .nearby-meta { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
+    .nearby-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .nearby-dist { font-size: 0.8rem; font-weight: 700; color: #fff; }
+    .nearby-status { font-size: 0.7rem; color: var(--green); }
+
+    /* Tour progress */
+    .tour-progress-wrap {
+      margin-top: 8px;
+    }
+
+    .tour-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .prog-bar {
+      height: 8px;
+      background: var(--border2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--accent));
+      border-radius: 4px;
+      width: 34.7%;
+    }
+
+    /* Activity feed */
+    .activity-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .activity-row:last-child { border-bottom: none; }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .activity-text { flex: 1; color: var(--text); }
+    .activity-time { color: var(--muted); font-size: 0.72rem; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      .quick-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item active">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="planner.html" class="nav-item">
+        <span class="nav-icon">🗓️</span> Tour Planner
+      </a>
+      <a href="map.html" class="nav-item">
+        <span class="nav-icon">🗺️</span> Map View
+      </a>
+      <a href="marketplace.html" class="nav-item">
+        <span class="nav-icon">🎸</span> Local Talent
+      </a>
+      <a href="budget.html" class="nav-item">
+        <span class="nav-icon">💰</span> Budget
+      </a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item">
+        <span class="nav-icon">🛒</span> Nearby Stores
+      </a>
+      <a href="promo.html" class="nav-item">
+        <span class="nav-icon">📣</span> Promo Tools
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Good Evening, Rust &amp; Chrome 👋</h1>
+        <p>Thursday · June 15, 2026 · Day 8 of 23</p>
+      </div>
+      <div class="topbar-right">
+        <a href="map.html" class="icon-btn" title="Map">🗺️</a>
+        <div class="icon-btn notif-dot" title="Notifications">🔔</div>
+        <a href="profile.html" class="avatar" style="text-decoration:none;">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- ALERT -->
+      <div class="alert-band">
+        <span class="alert-band-icon">⚠️</span>
+        <span><strong>Heads up:</strong> Soundcheck at Exit/In is at 6:30 PM — 2 hrs 14 min from now. Check in with venue contact: <strong>Jake Sauer</strong> · (615) 555-0147</span>
+      </div>
+
+      <!-- TONIGHT + STATS -->
+      <div class="grid-2 mb-24">
+        <!-- Tonight card -->
+        <div class="tonight-card">
+          <div class="tonight-label">Tonight's Show</div>
+          <div class="countdown-badge">⏱ Doors in 5h 30m</div>
+          <div class="tonight-venue">Exit/In</div>
+          <div class="tonight-city">2208 Elliston Pl, Nashville, TN 37203</div>
+          <div class="tonight-meta">
+            <div class="tonight-meta-item">🕘 <span>9:00 PM Showtime</span></div>
+            <div class="tonight-meta-item">🔞 <span>21+ Show</span></div>
+            <div class="tonight-meta-item">🎟 <span>Cap. 600</span></div>
+            <div class="tonight-meta-item">💵 <span>$200 Guarantee</span></div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="map.html" class="btn btn-primary btn-sm">📍 Get Directions</a>
+            <button class="btn btn-outline btn-sm">📋 Set List</button>
+          </div>
+        </div>
+
+        <!-- Stats column -->
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div class="stat-tile" style="flex:1;">
+            <div class="stat-tile-label">Miles to Atlanta</div>
+            <div class="stat-tile-value">262</div>
+            <div class="stat-tile-sub">Next stop · Jun 17 · The Masquerade</div>
+          </div>
+          <div class="stat-tile" style="flex:1;">
+            <div class="stat-tile-label">Budget Remaining</div>
+            <div class="stat-tile-value" style="color:#81c784;">$4,660</div>
+            <div class="stat-tile-sub">of $12,500 total · 62.7% spent</div>
+          </div>
+          <div class="stat-tile" style="flex:1;">
+            <div class="stat-tile-label">Tour Progress</div>
+            <div class="stat-tile-value">8 <span style="font-size:1rem; font-weight:500; color:var(--muted);">/ 23</span></div>
+            <div class="tour-progress-wrap">
+              <div class="tour-progress-labels">
+                <span>Memphis, TN</span>
+                <span>New York, NY</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="card mb-24">
+        <div class="card-header">
+          <span class="card-title">Quick Actions</span>
+        </div>
+        <div class="quick-grid">
+          <a href="map.html" class="quick-tile">
+            <div class="quick-tile-icon">🗺️</div>
+            <div class="quick-tile-label">Map View</div>
+          </a>
+          <a href="marketplace.html" class="quick-tile">
+            <div class="quick-tile-icon">🎸</div>
+            <div class="quick-tile-label">Find Talent</div>
+          </a>
+          <a href="stores.html" class="quick-tile">
+            <div class="quick-tile-icon">🛒</div>
+            <div class="quick-tile-label">Gear Stores</div>
+          </a>
+          <a href="budget.html" class="quick-tile">
+            <div class="quick-tile-icon">💰</div>
+            <div class="quick-tile-label">Log Expense</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW: Nearby + Activity -->
+      <div class="grid-2">
+
+        <!-- Nearby Now -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Nearby Now</span>
+            <a href="map.html" class="card-action">See map →</a>
+          </div>
+
+          <div class="nearby-row">
+            <div class="nearby-icon" style="background:rgba(255,193,7,0.12);">⛽</div>
+            <div class="nearby-body">
+              <div class="nearby-name">Shell — Elliston Place</div>
+              <div class="nearby-meta">Gas Station · Regular: $3.09/gal</div>
+            </div>
+            <div class="nearby-right">
+              <div class="nearby-dist">0.4 mi</div>
+              <div class="nearby-status">● Open</div>
+            </div>
+          </div>
+
+          <div class="nearby-row">
+            <div class="nearby-icon" style="background:rgba(229,57,53,0.12);">🍗</div>
+            <div class="nearby-body">
+              <div class="nearby-name">Hattie B's Hot Chicken</div>
+              <div class="nearby-meta">Restaurant · $$ · 4.7★</div>
+            </div>
+            <div class="nearby-right">
+              <div class="nearby-dist">0.3 mi</div>
+              <div class="nearby-status">● Open until 10 PM</div>
+            </div>
+          </div>
+
+          <div class="nearby-row">
+            <div class="nearby-icon" style="background:rgba(33,150,243,0.12);">🎸</div>
+            <div class="nearby-body">
+              <div class="nearby-name">Guitar City Nashville</div>
+              <div class="nearby-meta">Music Store · Strings, Amps</div>
+            </div>
+            <div class="nearby-right">
+              <div class="nearby-dist">1.1 mi</div>
+              <div class="nearby-status">● Open until 9 PM</div>
+            </div>
+          </div>
+
+          <div class="nearby-row">
+            <div class="nearby-icon" style="background:rgba(76,175,80,0.12);">🏨</div>
+            <div class="nearby-body">
+              <div class="nearby-name">Graduate Nashville</div>
+              <div class="nearby-meta">Hotel · Avg $149/night</div>
+            </div>
+            <div class="nearby-right">
+              <div class="nearby-dist">0.7 mi</div>
+              <div class="nearby-status" style="color:var(--muted);">2 rooms left</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Activity</span>
+            <span class="card-action">View all</span>
+          </div>
+
+          <div class="activity-row">
+            <div class="activity-dot" style="background:var(--green);"></div>
+            <div class="activity-text">
+              <strong>Marcus Johnson</strong> confirmed as fill-in drummer for Atlanta show
+            </div>
+            <div class="activity-time">2h ago</div>
+          </div>
+
+          <div class="activity-row">
+            <div class="activity-dot" style="background:var(--yellow);"></div>
+            <div class="activity-text">
+              Budget alert: <strong>Gas</strong> spending at 70% of allocation
+            </div>
+            <div class="activity-time">4h ago</div>
+          </div>
+
+          <div class="activity-row">
+            <div class="activity-dot" style="background:var(--red);"></div>
+            <div class="activity-text">
+              New booking request from <strong>Smokehouse Voodoo</strong>
+            </div>
+            <div class="activity-time">Yesterday</div>
+          </div>
+
+          <div class="activity-row">
+            <div class="activity-dot" style="background:var(--blue);"></div>
+            <div class="activity-text">
+              Tour route updated — Charlotte added between Atlanta and Richmond
+            </div>
+            <div class="activity-time">Jun 14</div>
+          </div>
+
+          <div class="activity-row">
+            <div class="activity-dot" style="background:var(--muted);"></div>
+            <div class="activity-text">
+              Expense logged: Noelle Hotel Nashville · <strong>$180</strong>
+            </div>
+            <div class="activity-time">Jun 14</div>
+          </div>
+
+          <div class="activity-row">
+            <div class="activity-dot" style="background:var(--green);"></div>
+            <div class="activity-text">
+              <strong>Exit/In contract</strong> signed — deposit received ✓
+            </div>
+            <div class="activity-time">Jun 10</div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item active">
+      <span class="nav-icon">🏠</span><span>Home</span>
+    </a>
+    <a href="map.html" class="bottom-nav-item">
+      <span class="nav-icon">🗺️</span><span>Map</span>
+    </a>
+    <a href="marketplace.html" class="bottom-nav-item">
+      <span class="nav-icon">🎸</span><span>Find</span>
+    </a>
+    <a href="planner.html" class="bottom-nav-item">
+      <span class="nav-icon">🗓️</span><span>Plan</span>
+    </a>
+    <a href="budget.html" class="bottom-nav-item">
+      <span class="nav-icon">💰</span><span>Budget</span>
+    </a>
+  </div>
+</nav>
+
+</body>
+</html>

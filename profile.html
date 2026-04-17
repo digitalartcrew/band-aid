@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Profile</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Cover + avatar */
+    .profile-cover {
+      height: 160px;
+      background: linear-gradient(135deg, #1a0505 0%, #2d0a0a 30%, #1a1020 70%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(229,57,53,0.25) 0%, transparent 50%),
+        radial-gradient(circle at 80% 30%, rgba(255,107,53,0.15) 0%, transparent 40%);
+    }
+
+    .cover-wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--darker);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .profile-avatar-wrap {
+      position: absolute;
+      bottom: -36px;
+      left: 28px;
+    }
+
+    .profile-avatar-xl {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--red), #ff6b35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #fff;
+      border: 3px solid var(--darker);
+    }
+
+    .profile-header {
+      padding: 44px 28px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 3px;
+    }
+
+    .profile-tagline {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Toggle switch */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .toggle-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .toggle-sub {
+      font-size: 0.72rem;
+      color: var(--green);
+    }
+
+    .toggle {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      background: var(--green);
+      border-radius: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 21px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: left 0.2s;
+    }
+
+    .toggle.off {
+      background: var(--border2);
+    }
+
+    .toggle.off::after { left: 3px; }
+
+    /* Member card */
+    .member-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .member-name { font-size: 0.9rem; font-weight: 600; color: #fff; }
+    .member-role { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* Offer item */
+    .offer-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+
+    .offer-item:last-child { border-bottom: none; }
+
+    .offer-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .offer-name { flex: 1; color: #fff; font-weight: 500; }
+    .offer-type { font-size: 0.72rem; color: var(--muted); }
+
+    /* Upcoming show row */
+    .show-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .show-row:last-child { border-bottom: none; }
+
+    .show-date-box {
+      width: 40px;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .show-date-month { font-size: 0.6rem; text-transform: uppercase; color: var(--red); font-weight: 700; }
+    .show-date-day { font-size: 1rem; font-weight: 800; color: #fff; line-height: 1; }
+
+    .show-body { flex: 1; }
+    .show-venue { font-size: 0.875rem; font-weight: 600; color: #fff; }
+    .show-city { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
+    /* Reviews */
+    .review-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .review-name { font-size: 0.85rem; font-weight: 600; color: #fff; }
+    .review-time { font-size: 0.7rem; color: var(--muted); }
+    .review-text { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+    /* Social links */
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.875rem;
+      transition: color 0.12s;
+    }
+
+    .social-link:last-child { border-bottom: none; }
+    .social-link:hover { color: #fff; }
+
+    .social-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      .profile-two-col { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile" style="background:rgba(229,57,53,0.08);border:1px solid rgba(229,57,53,0.2);border-radius:8px;">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name" style="font-size:.85rem;">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Band Profile</h1>
+        <p>Public profile visible to local musicians and partners</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm">Edit Profile</button>
+        <button class="btn btn-primary btn-sm">Share Profile</button>
+      </div>
+    </header>
+
+    <main class="page" style="padding:0;max-width:none;">
+
+      <!-- COVER -->
+      <div class="profile-cover">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar-xl">RC</div>
+        </div>
+        <div class="cover-wave"></div>
+      </div>
+
+      <!-- PROFILE HEADER -->
+      <div class="profile-header" style="max-width:1200px;margin:0 auto;padding:44px 28px 0;">
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-tagline">Southern Rock / Blues Rock · Memphis, TN · Est. 2019</div>
+          <div style="display:flex;gap:16px;font-size:.8rem;color:var(--muted);flex-wrap:wrap;">
+            <span>⭐ 4.9 · <strong style="color:#fff;">47 shows</strong> as partners</span>
+            <span>🎸 <strong style="color:#fff;">4 members</strong></span>
+            <span>🗺️ On tour: <strong style="color:var(--green);">Summer 2026</strong></span>
+            <span>📍 Currently: <strong style="color:#fff;">Nashville, TN</strong></span>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn btn-outline btn-sm">🎵 Listen on Spotify</button>
+          <button class="btn btn-primary btn-sm">📩 Contact for Booking</button>
+        </div>
+      </div>
+
+      <div style="max-width:1200px;margin:0 auto;padding:24px 28px;">
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;" class="profile-two-col">
+
+          <!-- LEFT -->
+          <div style="display:flex;flex-direction:column;gap:20px;">
+
+            <!-- About -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">About</span></div>
+              <p style="font-size:.875rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">
+                Rust &amp; Chrome is a four-piece Southern rock outfit out of Memphis, TN. Drawing from the tradition of Lynyrd Skynyrd, Black Crowes, and The Allman Brothers, we bring high-energy, groove-driven sets to stages across the Southeast and beyond.
+              </p>
+              <p style="font-size:.875rem;color:var(--muted);line-height:1.7;">
+                Currently on our Summer 2026 tour — 23 shows across 7 cities. We're active on BandAid and open to partnerships, gear loans, and fill-in opportunities in every city we play.
+              </p>
+              <div class="tags" style="margin-top:14px;">
+                <span class="tag">Southern Rock</span>
+                <span class="tag">Blues Rock</span>
+                <span class="tag">Americana</span>
+                <span class="tag">Original Music</span>
+                <span class="tag">Live Performance</span>
+                <span class="tag">Session Ready</span>
+              </div>
+            </div>
+
+            <!-- Members -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">Band Members</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="member-card">
+                  <div class="member-avatar" style="background:linear-gradient(135deg,#e53935,#ff6b35);">TH</div>
+                  <div>
+                    <div class="member-name">Tommy "Rust" Harris</div>
+                    <div class="member-role">🎤 Vocals / Rhythm Guitar</div>
+                  </div>
+                </div>
+                <div class="member-card">
+                  <div class="member-avatar" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">MW</div>
+                  <div>
+                    <div class="member-name">Marcus Webb</div>
+                    <div class="member-role">🎸 Lead Guitar</div>
+                  </div>
+                </div>
+                <div class="member-card">
+                  <div class="member-avatar" style="background:linear-gradient(135deg,#2e7d32,#66bb6a);">DC</div>
+                  <div>
+                    <div class="member-name">Dana Cole</div>
+                    <div class="member-role">🎵 Bass Guitar</div>
+                  </div>
+                </div>
+                <div class="member-card">
+                  <div class="member-avatar" style="background:linear-gradient(135deg,#6a1b9a,#ab47bc);">JR</div>
+                  <div>
+                    <div class="member-name">Joey Reyes</div>
+                    <div class="member-role">🥁 Drums / Percussion</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- What We Offer -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">What We Can Offer</span>
+                <span class="badge badge-green">● Available Now</span>
+              </div>
+
+              <div class="offer-item">
+                <div class="offer-icon" style="background:rgba(229,57,53,0.12);">🎤</div>
+                <div>
+                  <div class="offer-name">Rhythm Guitar + Vocals</div>
+                  <div class="offer-type">Tommy Harris · Available for fill-in shows</div>
+                </div>
+                <span class="badge badge-green">Available</span>
+              </div>
+
+              <div class="offer-item">
+                <div class="offer-icon" style="background:rgba(255,193,7,0.12);">🎸</div>
+                <div>
+                  <div class="offer-name">Marshall JCM800 Half-Stack</div>
+                  <div class="offer-type">Amp · Available for loan / rental · $50/show</div>
+                </div>
+                <span class="badge badge-green">Available</span>
+              </div>
+
+              <div class="offer-item">
+                <div class="offer-icon" style="background:rgba(33,150,243,0.12);">🔊</div>
+                <div>
+                  <div class="offer-name">Full PA System (2,000W)</div>
+                  <div class="offer-type">Yamaha DXR15 mains · QSC sub · Available</div>
+                </div>
+                <span class="badge badge-green">Available</span>
+              </div>
+
+              <div class="offer-item">
+                <div class="offer-icon" style="background:rgba(76,175,80,0.12);">🥁</div>
+                <div>
+                  <div class="offer-name">Drum Kit (Pearl Export)</div>
+                  <div class="offer-type">Available for rehearsals only · Nashville only</div>
+                </div>
+                <span class="badge badge-yellow">Rehearsal Only</span>
+              </div>
+
+            </div>
+
+            <!-- Reviews -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Reviews from Partners</span>
+                <span style="font-size:.8rem;color:var(--yellow);">★★★★★ 4.9</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="review-card">
+                  <div class="review-header">
+                    <div class="avatar" style="width:32px;height:32px;font-size:.75rem;background:linear-gradient(135deg,#1565c0,#42a5f5);">SV</div>
+                    <div>
+                      <div class="review-name">Smokehouse Voodoo</div>
+                      <div class="review-time">★★★★★ · 2 weeks ago · Memphis</div>
+                    </div>
+                  </div>
+                  <div class="review-text">"Loaned us their PA on 24-hour notice when ours blew. Professional, no drama, sounded great. These guys are what BandAid is all about."</div>
+                </div>
+                <div class="review-card">
+                  <div class="review-header">
+                    <div class="avatar" style="width:32px;height:32px;font-size:.75rem;background:linear-gradient(135deg,#2e7d32,#66bb6a);">ND</div>
+                    <div>
+                      <div class="review-name">Neon Desert</div>
+                      <div class="review-time">★★★★★ · 1 month ago · Nashville</div>
+                    </div>
+                  </div>
+                  <div class="review-text">"Tommy sat in on rhythm guitar for us when our lead had food poisoning. Learned the set in 2 hours. Crowd never knew."</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT -->
+          <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:84px;">
+
+            <!-- Partner toggle -->
+            <div class="card" style="padding:14px 16px;">
+              <div style="font-size:.75rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Partner Status</div>
+              <div class="toggle-wrap" onclick="togglePartner()" style="padding:10px 12px;cursor:pointer;">
+                <div style="flex:1;">
+                  <div class="toggle-label">Available to Partner</div>
+                  <div class="toggle-sub" id="toggleSub">Open for fill-ins &amp; gear loans</div>
+                </div>
+                <div class="toggle" id="toggleSwitch"></div>
+              </div>
+            </div>
+
+            <!-- Upcoming shows -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Upcoming Shows</span>
+                <a href="planner.html" class="card-action">Full route →</a>
+              </div>
+              <div class="show-row">
+                <div class="show-date-box">
+                  <div class="show-date-month">Jun</div>
+                  <div class="show-date-day">15</div>
+                </div>
+                <div class="show-body">
+                  <div class="show-venue">Exit/In</div>
+                  <div class="show-city">Nashville, TN · Tonight</div>
+                </div>
+                <span class="badge badge-red">Tonight</span>
+              </div>
+              <div class="show-row">
+                <div class="show-date-box">
+                  <div class="show-date-month">Jun</div>
+                  <div class="show-date-day">17</div>
+                </div>
+                <div class="show-body">
+                  <div class="show-venue">The Masquerade</div>
+                  <div class="show-city">Atlanta, GA</div>
+                </div>
+                <span class="badge badge-green">Confirmed</span>
+              </div>
+              <div class="show-row" style="border-bottom:none;">
+                <div class="show-date-box">
+                  <div class="show-date-month">Jun</div>
+                  <div class="show-date-day">22</div>
+                </div>
+                <div class="show-body">
+                  <div class="show-venue">9:30 Club</div>
+                  <div class="show-city">Washington, DC</div>
+                </div>
+                <span class="badge badge-green">Confirmed</span>
+              </div>
+            </div>
+
+            <!-- Social links -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">Links</span></div>
+              <a href="#" class="social-link">
+                <div class="social-icon" style="background:rgba(30,215,96,0.12);">🎵</div>
+                <span>Spotify</span>
+                <span style="margin-left:auto;color:var(--muted);font-size:.75rem;">rust-and-chrome</span>
+              </a>
+              <a href="#" class="social-link">
+                <div class="social-icon" style="background:rgba(225,48,108,0.12);">📸</div>
+                <span>Instagram</span>
+                <span style="margin-left:auto;color:var(--muted);font-size:.75rem;">@rustandchrome</span>
+              </a>
+              <a href="#" class="social-link">
+                <div class="social-icon" style="background:rgba(255,85,0,0.12);">🎧</div>
+                <span>SoundCloud</span>
+                <span style="margin-left:auto;color:var(--muted);font-size:.75rem;">rustandchrome</span>
+              </a>
+              <a href="#" class="social-link" style="border-bottom:none;">
+                <div class="social-icon" style="background:rgba(255,255,255,0.06);">🌐</div>
+                <span>Website</span>
+                <span style="margin-left:auto;color:var(--muted);font-size:.75rem;">rustandchrome.com</span>
+              </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">Stats</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="text-align:center;padding:10px;background:var(--card2);border-radius:8px;">
+                  <div style="font-size:1.3rem;font-weight:800;color:#fff;">47</div>
+                  <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Partner Shows</div>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--card2);border-radius:8px;">
+                  <div style="font-size:1.3rem;font-weight:800;color:#ffd54f;">4.9★</div>
+                  <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Rating</div>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--card2);border-radius:8px;">
+                  <div style="font-size:1.3rem;font-weight:800;color:#fff;">100%</div>
+                  <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Show-Up Rate</div>
+                </div>
+                <div style="text-align:center;padding:10px;background:var(--card2);border-radius:8px;">
+                  <div style="font-size:1.3rem;font-weight:800;color:#81c784;">7</div>
+                  <div style="font-size:.68rem;color:var(--muted);margin-top:2px;">Years Active</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  let partnerOn = true;
+
+  function togglePartner() {
+    partnerOn = !partnerOn;
+    const sw = document.getElementById('toggleSwitch');
+    const sub = document.getElementById('toggleSub');
+    if (partnerOn) {
+      sw.classList.remove('off');
+      sub.textContent = 'Open for fill-ins & gear loans';
+      sub.style.color = 'var(--green)';
+    } else {
+      sw.classList.add('off');
+      sub.textContent = 'Not accepting requests right now';
+      sub.style.color = 'var(--muted)';
+    }
+  }
+</script>
+</body>
+</html>

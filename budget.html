@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Budget</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Overview hero */
+    .budget-hero {
+      background: linear-gradient(135deg, #0a1a0a 0%, #0f240f 100%);
+      border: 1px solid rgba(76,175,80,0.25);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .budget-hero-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 6px;
+    }
+
+    .budget-numbers {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .budget-spent {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+    }
+
+    .budget-total {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .budget-pct {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #81c784;
+      margin-left: auto;
+    }
+
+    .main-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .main-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      border-radius: 5px;
+      width: 62.7%;
+    }
+
+    .budget-hero-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .budget-hero-meta span { color: rgba(255,255,255,0.7); font-weight: 600; }
+
+    /* Category rows */
+    .cat-row {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cat-row:last-child { border-bottom: none; }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+
+    .cat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .cat-name { font-size: 0.875rem; font-weight: 600; color: #fff; flex: 1; }
+
+    .cat-amounts {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .cat-spent { font-size: 0.875rem; font-weight: 700; color: #fff; }
+    .cat-budget { font-size: 0.7rem; color: var(--muted); }
+    .cat-pct { font-size: 0.72rem; font-weight: 600; }
+
+    .cat-bar {
+      height: 5px;
+      background: var(--border2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .cat-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* Transaction list */
+    .txn-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .txn-row:last-child { border-bottom: none; }
+
+    .txn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .txn-body { flex: 1; min-width: 0; }
+    .txn-name { font-size: 0.875rem; font-weight: 600; color: #fff; }
+    .txn-meta { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+    .txn-amount {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ff8a80;
+      flex-shrink: 0;
+    }
+
+    /* Add expense modal */
+    .fab-add {
+      position: fixed;
+      bottom: 32px;
+      right: 24px;
+      background: var(--red);
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 13px 20px;
+      border-radius: 28px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(229,57,53,0.35);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.1s;
+      z-index: 50;
+    }
+
+    .fab-add:hover { background: #c62828; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      .fab-add { right: 16px; bottom: 82px; }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--dark);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal { transform: scale(1); }
+
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* Daily burn chart */
+    .burn-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 60px;
+      margin-top: 12px;
+    }
+
+    .burn-bar {
+      flex: 1;
+      background: var(--red);
+      opacity: 0.6;
+      border-radius: 3px 3px 0 0;
+      min-height: 4px;
+      transition: opacity 0.15s;
+      cursor: pointer;
+    }
+
+    .burn-bar:hover { opacity: 1; }
+    .burn-bar.today { opacity: 1; background: var(--red); }
+
+    .burn-labels {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .burn-label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.6rem;
+      color: var(--muted2);
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="budget.html" class="nav-item active"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Budget Tracker</h1>
+        <p>Summer Tour 2026 · Day 8 of 23</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm">Export CSV</button>
+        <a href="profile.html" class="avatar" style="margin-left:4px;">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- OVERVIEW -->
+      <div class="budget-hero">
+        <div class="budget-hero-label">Summer Tour 2026 — Total Budget</div>
+        <div class="budget-numbers">
+          <div class="budget-spent">$7,840</div>
+          <div class="budget-total">/ $12,500</div>
+          <div class="budget-pct">62.7% spent</div>
+        </div>
+        <div class="main-bar"><div class="main-bar-fill"></div></div>
+        <div class="budget-hero-meta">
+          Remaining: <span>$4,660</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+          Daily burn: <span>$980/day</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+          Days left: <span>15</span>&nbsp;&nbsp;·&nbsp;&nbsp;
+          Projected end: <span style="color:#81c784;">Under budget ✓</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;">
+
+        <!-- LEFT: Categories + Transactions -->
+        <div>
+
+          <!-- CATEGORIES -->
+          <div class="card mb-24">
+            <div class="card-header">
+              <span class="card-title">By Category</span>
+              <span class="card-action" onclick="openModal('addModal')">+ Add Expense</span>
+            </div>
+
+            <!-- Gas -->
+            <div class="cat-row">
+              <div class="cat-header">
+                <div class="cat-icon" style="background:rgba(255,193,7,0.12);">⛽</div>
+                <div class="cat-name">Gas & Transport</div>
+                <div class="cat-amounts">
+                  <div class="cat-spent">$2,100</div>
+                  <div class="cat-budget">of $3,000</div>
+                </div>
+                <div class="cat-pct" style="color:#ffd54f;margin-left:12px;">70%</div>
+              </div>
+              <div class="cat-bar">
+                <div class="cat-fill" style="width:70%;background:linear-gradient(90deg,#ffc107,#ffd54f);"></div>
+              </div>
+            </div>
+
+            <!-- Lodging -->
+            <div class="cat-row">
+              <div class="cat-header">
+                <div class="cat-icon" style="background:rgba(33,150,243,0.12);">🏨</div>
+                <div class="cat-name">Lodging</div>
+                <div class="cat-amounts">
+                  <div class="cat-spent">$2,400</div>
+                  <div class="cat-budget">of $3,500</div>
+                </div>
+                <div class="cat-pct" style="color:#64b5f6;margin-left:12px;">69%</div>
+              </div>
+              <div class="cat-bar">
+                <div class="cat-fill" style="width:69%;background:linear-gradient(90deg,#1565c0,#42a5f5);"></div>
+              </div>
+            </div>
+
+            <!-- Food -->
+            <div class="cat-row">
+              <div class="cat-header">
+                <div class="cat-icon" style="background:rgba(255,107,53,0.12);">🍕</div>
+                <div class="cat-name">Food & Drink</div>
+                <div class="cat-amounts">
+                  <div class="cat-spent">$1,800</div>
+                  <div class="cat-budget">of $2,500</div>
+                </div>
+                <div class="cat-pct" style="color:#ffab76;margin-left:12px;">72%</div>
+              </div>
+              <div class="cat-bar">
+                <div class="cat-fill" style="width:72%;background:linear-gradient(90deg,#ff6b35,#ffa580);"></div>
+              </div>
+            </div>
+
+            <!-- Gear -->
+            <div class="cat-row">
+              <div class="cat-header">
+                <div class="cat-icon" style="background:rgba(229,57,53,0.12);">🎸</div>
+                <div class="cat-name">Gear & Equipment</div>
+                <div class="cat-amounts">
+                  <div class="cat-spent">$890</div>
+                  <div class="cat-budget">of $1,500</div>
+                </div>
+                <div class="cat-pct" style="color:#ff8a80;margin-left:12px;">59%</div>
+              </div>
+              <div class="cat-bar">
+                <div class="cat-fill" style="width:59%;background:linear-gradient(90deg,#e53935,#ef9a9a);"></div>
+              </div>
+            </div>
+
+            <!-- Talent -->
+            <div class="cat-row">
+              <div class="cat-header">
+                <div class="cat-icon" style="background:rgba(156,39,176,0.12);">🎤</div>
+                <div class="cat-name">Hired Talent</div>
+                <div class="cat-amounts">
+                  <div class="cat-spent">$450</div>
+                  <div class="cat-budget">of $1,000</div>
+                </div>
+                <div class="cat-pct" style="color:#ce93d8;margin-left:12px;">45%</div>
+              </div>
+              <div class="cat-bar">
+                <div class="cat-fill" style="width:45%;background:linear-gradient(90deg,#9c27b0,#ce93d8);"></div>
+              </div>
+            </div>
+
+            <!-- Promo -->
+            <div class="cat-row">
+              <div class="cat-header">
+                <div class="cat-icon" style="background:rgba(76,175,80,0.12);">📣</div>
+                <div class="cat-name">Promo & Marketing</div>
+                <div class="cat-amounts">
+                  <div class="cat-spent">$200</div>
+                  <div class="cat-budget">of $500</div>
+                </div>
+                <div class="cat-pct" style="color:#81c784;margin-left:12px;">40%</div>
+              </div>
+              <div class="cat-bar">
+                <div class="cat-fill" style="width:40%;background:linear-gradient(90deg,#4caf50,#81c784);"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TRANSACTIONS -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recent Transactions</span>
+              <span class="card-action">View all (47)</span>
+            </div>
+
+            <div class="txn-row">
+              <div class="txn-icon" style="background:rgba(255,107,53,0.15);">🍗</div>
+              <div class="txn-body">
+                <div class="txn-name">Hattie B's Hot Chicken</div>
+                <div class="txn-meta">Food · Nashville, TN · Today</div>
+              </div>
+              <div class="txn-amount">–$63</div>
+            </div>
+
+            <div class="txn-row">
+              <div class="txn-icon" style="background:rgba(255,193,7,0.15);">⛽</div>
+              <div class="txn-body">
+                <div class="txn-name">Shell — Elliston Place</div>
+                <div class="txn-meta">Gas · Nashville, TN · Today</div>
+              </div>
+              <div class="txn-amount">–$47</div>
+            </div>
+
+            <div class="txn-row">
+              <div class="txn-icon" style="background:rgba(33,150,243,0.15);">🏨</div>
+              <div class="txn-body">
+                <div class="txn-name">Noelle Hotel Nashville</div>
+                <div class="txn-meta">Lodging · Nashville, TN · Jun 14</div>
+              </div>
+              <div class="txn-amount">–$360</div>
+            </div>
+
+            <div class="txn-row">
+              <div class="txn-icon" style="background:rgba(229,57,53,0.15);">🎸</div>
+              <div class="txn-body">
+                <div class="txn-name">Guitar City Nashville</div>
+                <div class="txn-meta">Gear · Nashville, TN · Jun 14</div>
+              </div>
+              <div class="txn-amount">–$42</div>
+            </div>
+
+            <div class="txn-row">
+              <div class="txn-icon" style="background:rgba(255,193,7,0.15);">⛽</div>
+              <div class="txn-body">
+                <div class="txn-name">Flying J — Memphis, TN</div>
+                <div class="txn-meta">Gas · Memphis, TN · Jun 12</div>
+              </div>
+              <div class="txn-amount">–$55</div>
+            </div>
+
+            <div class="txn-row">
+              <div class="txn-icon" style="background:rgba(156,39,176,0.15);">🎤</div>
+              <div class="txn-body">
+                <div class="txn-name">Fill-in Drummer — Show #6</div>
+                <div class="txn-meta">Hired Talent · Memphis · Jun 11</div>
+              </div>
+              <div class="txn-amount">–$200</div>
+            </div>
+
+            <div class="txn-row" style="border-bottom:none;">
+              <div class="txn-icon" style="background:rgba(76,175,80,0.15);">✓</div>
+              <div class="txn-body">
+                <div class="txn-name">Exit/In — Booking Deposit</div>
+                <div class="txn-meta">Income · Nashville · Jun 10</div>
+              </div>
+              <div class="txn-amount" style="color:#81c784;">+$100</div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- RIGHT sidebar -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:84px;">
+
+          <!-- Daily burn -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Daily Burn Rate</span>
+            </div>
+            <div style="font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2px;">$980 <span style="font-size:.875rem;font-weight:400;color:var(--muted);">/day</span></div>
+            <div style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">7-day average · Target: $870/day</div>
+            <div class="burn-chart">
+              <div class="burn-bar" style="height:45%;"></div>
+              <div class="burn-bar" style="height:60%;"></div>
+              <div class="burn-bar" style="height:50%;"></div>
+              <div class="burn-bar" style="height:75%;"></div>
+              <div class="burn-bar" style="height:55%;"></div>
+              <div class="burn-bar" style="height:90%;"></div>
+              <div class="burn-bar today" style="height:100%;"></div>
+            </div>
+            <div class="burn-labels">
+              <div class="burn-label">Jun 9</div>
+              <div class="burn-label">10</div>
+              <div class="burn-label">11</div>
+              <div class="burn-label">12</div>
+              <div class="burn-label">13</div>
+              <div class="burn-label">14</div>
+              <div class="burn-label" style="color:var(--text);">Today</div>
+            </div>
+          </div>
+
+          <!-- Per-category remaining -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Remaining</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+                <span style="color:var(--muted);">⛽ Gas</span><span style="color:#fff;font-weight:600;">$900</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+                <span style="color:var(--muted);">🏨 Lodging</span><span style="color:#fff;font-weight:600;">$1,100</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+                <span style="color:var(--muted);">🍕 Food</span><span style="color:#fff;font-weight:600;">$700</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+                <span style="color:var(--muted);">🎸 Gear</span><span style="color:#fff;font-weight:600;">$610</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+                <span style="color:var(--muted);">🎤 Talent</span><span style="color:#fff;font-weight:600;">$550</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+                <span style="color:var(--muted);">📣 Promo</span><span style="color:#fff;font-weight:600;">$300</span>
+              </div>
+              <hr class="divider" style="margin:4px 0;" />
+              <div style="display:flex;justify-content:space-between;font-size:.875rem;">
+                <span style="color:var(--text);font-weight:700;">Total Left</span>
+                <span style="color:#81c784;font-weight:800;">$4,660</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forecast -->
+          <div class="card" style="background:rgba(76,175,80,0.05);border-color:rgba(76,175,80,0.2);">
+            <div style="font-size:.78rem;font-weight:700;color:#81c784;margin-bottom:8px;">📊 FORECAST</div>
+            <div style="font-size:.82rem;color:var(--text);line-height:1.6;">
+              At current burn rate, you'll finish the tour with <strong style="color:#81c784;">~$680 remaining</strong>. To stay safe, keep daily spend under $880 from here on.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab-add" onclick="openModal('addModal')">
+  ＋ Add Expense
+</button>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="modal-overlay" id="addModal" onclick="closeOnOverlay(event,'addModal')">
+  <div class="modal">
+    <div style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:4px;">Log Expense</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:20px;">Add a new expense to your tour budget</div>
+
+    <div class="input-group">
+      <label class="input-label">Category</label>
+      <select class="input">
+        <option>⛽ Gas & Transport</option>
+        <option>🏨 Lodging</option>
+        <option selected>🍕 Food & Drink</option>
+        <option>🎸 Gear & Equipment</option>
+        <option>🎤 Hired Talent</option>
+        <option>📣 Promo & Marketing</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Description</label>
+      <input class="input" type="text" placeholder="e.g. Waffle House — Atlanta" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="input-group">
+        <label class="input-label">Amount ($)</label>
+        <input class="input" type="number" placeholder="0.00" step="0.01" />
+      </div>
+      <div class="input-group">
+        <label class="input-label">Date</label>
+        <input class="input" type="date" value="2026-06-15" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="flex:2;" onclick="confirmExpense()">Log Expense</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item active"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeOnOverlay(e, id) {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  }
+
+  function confirmExpense() {
+    closeModal('addModal');
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:12px 24px;border-radius:8px;font-size:.875rem;font-weight:600;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+    banner.textContent = '✓ Expense logged successfully';
+    document.body.appendChild(banner);
+    setTimeout(() => banner.remove(), 3000);
+  }
+</script>
+</body>
+</html>

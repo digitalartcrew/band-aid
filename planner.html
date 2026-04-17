@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Tour Planner</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Route timeline */
+    .route-timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .route-timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 20px;
+      bottom: 20px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--red), var(--border2));
+    }
+
+    .stop-row {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .stop-dot {
+      position: absolute;
+      left: -32px;
+      top: 20px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--card);
+      z-index: 2;
+    }
+
+    .stop-dot.tonight { background: var(--red); box-shadow: 0 0 0 4px rgba(229,57,53,0.2); }
+    .stop-dot.confirmed { background: var(--green); }
+    .stop-dot.upcoming { background: var(--border2); border-color: var(--border2); }
+    .stop-dot.done { background: var(--muted2); }
+
+    .stop-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: border-color 0.15s;
+      cursor: pointer;
+    }
+
+    .stop-card:hover { border-color: rgba(229,57,53,0.25); }
+    .stop-card.tonight { border-color: rgba(229,57,53,0.4); background: rgba(229,57,53,0.04); }
+    .stop-card.done { opacity: 0.55; }
+
+    .stop-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .stop-city {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stop-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .stop-venue {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stop-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stop-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Drive segment */
+    .drive-segment {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0 6px 0;
+      margin-left: -32px;
+      padding-left: 32px;
+    }
+
+    .drive-line-icon {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      flex-shrink: 0;
+    }
+
+    .drive-info {
+      font-size: 0.72rem;
+      color: var(--muted2);
+      display: flex;
+      gap: 8px;
+    }
+
+    .drive-info span { font-weight: 600; color: var(--muted); }
+
+    /* Tour summary card */
+    .tour-summary {
+      background: linear-gradient(135deg, #0f1a0f 0%, #1a2a1a 100%);
+      border: 1px solid rgba(76,175,80,0.25);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .tour-summary-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .tour-summary-dates {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 18px;
+    }
+
+    .tour-summary-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .ts-stat { text-align: center; }
+    .ts-val { font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .ts-label { font-size: 0.65rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* Add stop form */
+    .add-stop-form {
+      background: var(--card);
+      border: 1px dashed var(--border2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .add-stop-form.open { display: block; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    @media (max-width: 540px) {
+      .tour-summary-stats { grid-template-columns: repeat(2, 1fr); }
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* Gas estimate pill */
+    .gas-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,193,7,0.1);
+      border: 1px solid rgba(255,193,7,0.2);
+      color: #ffd54f;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item active"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Tour Planner</h1>
+        <p>Summer Tour 2026 · 7 cities · 23 shows</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm">Export PDF</button>
+        <button class="btn btn-primary btn-sm" onclick="toggleAddStop()">+ Add Stop</button>
+        <a href="profile.html" class="avatar" style="margin-left:4px;">RC</a>
+      </div>
+    </header>
+
+    <main class="page">
+
+      <!-- TOUR SUMMARY -->
+      <div class="tour-summary">
+        <div class="tour-summary-title">Summer Tour 2026 🎸</div>
+        <div class="tour-summary-dates">Jun 8 – Jul 1, 2026 &nbsp;·&nbsp; Memphis, TN → New York, NY</div>
+        <div class="tour-summary-stats">
+          <div class="ts-stat"><div class="ts-val">23</div><div class="ts-label">Shows</div></div>
+          <div class="ts-stat"><div class="ts-val">7</div><div class="ts-label">Cities</div></div>
+          <div class="ts-stat"><div class="ts-val">1,847</div><div class="ts-label">Total Miles</div></div>
+          <div class="ts-stat"><div class="ts-val">$590</div><div class="ts-label">Est. Gas</div></div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 320px; gap: 24px; align-items:start;">
+
+        <!-- LEFT: Route timeline -->
+        <div>
+          <div class="section-heading flex justify-between items-center mb-16">
+            <div>
+              <h2>Route</h2>
+              <p>Tap a stop to view details and nearby resources</p>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-ghost btn-sm">Optimize Route</button>
+            </div>
+          </div>
+
+          <div class="route-timeline">
+
+            <!-- Memphis (origin - done) -->
+            <div class="stop-row">
+              <div class="stop-dot done"></div>
+              <div class="stop-card done">
+                <div class="stop-header">
+                  <div class="stop-city">Memphis, TN</div>
+                  <div class="stop-date">Jun 8–12 · 5 shows</div>
+                </div>
+                <div class="stop-venue">Various venues — Home run ✓</div>
+                <div class="stop-meta">
+                  <span class="badge badge-gray">Completed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>210 mi</span> · ~3h 15min · <span class="gas-pill">⛽ ~$35</span></div>
+            </div>
+
+            <!-- Nashville (tonight) -->
+            <div class="stop-row">
+              <div class="stop-dot tonight"></div>
+              <div class="stop-card tonight">
+                <div class="stop-header">
+                  <div class="stop-city">Nashville, TN</div>
+                  <div class="stop-date">Jun 13–16 · 4 shows</div>
+                </div>
+                <div class="stop-venue">Exit/In · The Basement · Station Inn · 3rd &amp; Lindsley</div>
+                <div class="stop-meta">
+                  <span class="badge badge-red">● You Are Here</span>
+                  <span class="stop-meta-item">🎟 Tonight: Exit/In · 9 PM</span>
+                  <span class="stop-meta-item">🏨 Noelle Hotel</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>262 mi</span> · ~3h 50min · <span class="gas-pill">⛽ ~$44</span></div>
+            </div>
+
+            <!-- Atlanta (confirmed) -->
+            <div class="stop-row">
+              <div class="stop-dot confirmed"></div>
+              <div class="stop-card">
+                <div class="stop-header">
+                  <div class="stop-city">Atlanta, GA</div>
+                  <div class="stop-date">Jun 17–18 · 2 shows</div>
+                </div>
+                <div class="stop-venue">The Masquerade · Vinyl</div>
+                <div class="stop-meta">
+                  <span class="badge badge-green">Confirmed</span>
+                  <span class="stop-meta-item">🥁 Fill-in drummer: Marcus Johnson</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>247 mi</span> · ~3h 30min · <span class="gas-pill">⛽ ~$41</span></div>
+            </div>
+
+            <!-- Charlotte (confirmed) -->
+            <div class="stop-row">
+              <div class="stop-dot confirmed"></div>
+              <div class="stop-card">
+                <div class="stop-header">
+                  <div class="stop-city">Charlotte, NC</div>
+                  <div class="stop-date">Jun 19–20 · 2 shows</div>
+                </div>
+                <div class="stop-venue">Neighborhood Theatre · Amos' Southend</div>
+                <div class="stop-meta">
+                  <span class="badge badge-green">Confirmed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>324 mi</span> · ~4h 50min · <span class="gas-pill">⛽ ~$54</span></div>
+            </div>
+
+            <!-- Richmond (upcoming) -->
+            <div class="stop-row">
+              <div class="stop-dot upcoming"></div>
+              <div class="stop-card">
+                <div class="stop-header">
+                  <div class="stop-city">Richmond, VA</div>
+                  <div class="stop-date">Jun 21–22 · 2 shows</div>
+                </div>
+                <div class="stop-venue">The National · Canal Club</div>
+                <div class="stop-meta">
+                  <span class="badge badge-yellow">Pending</span>
+                  <span class="stop-meta-item" style="color:var(--yellow);">⚠ Confirm venue deposit</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>108 mi</span> · ~1h 45min · <span class="gas-pill">⛽ ~$18</span></div>
+            </div>
+
+            <!-- Washington DC (upcoming) -->
+            <div class="stop-row">
+              <div class="stop-dot upcoming"></div>
+              <div class="stop-card">
+                <div class="stop-header">
+                  <div class="stop-city">Washington, DC</div>
+                  <div class="stop-date">Jun 22–23 · 1 show</div>
+                </div>
+                <div class="stop-venue">9:30 Club</div>
+                <div class="stop-meta">
+                  <span class="badge badge-green">Confirmed</span>
+                  <span class="stop-meta-item">🎟 Cap. 1,200 · Biggest show of tour</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>138 mi</span> · ~2h 30min · <span class="gas-pill">⛽ ~$23</span></div>
+            </div>
+
+            <!-- Philadelphia (upcoming) -->
+            <div class="stop-row">
+              <div class="stop-dot upcoming"></div>
+              <div class="stop-card">
+                <div class="stop-header">
+                  <div class="stop-city">Philadelphia, PA</div>
+                  <div class="stop-date">Jun 24–25 · 2 shows</div>
+                </div>
+                <div class="stop-venue">Union Transfer · The Foundry</div>
+                <div class="stop-meta">
+                  <span class="badge badge-yellow">Pending</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drive-segment">
+              <span class="drive-line-icon">🚗</span>
+              <div class="drive-info"><span>95 mi</span> · ~1h 45min · <span class="gas-pill">⛽ ~$16</span></div>
+            </div>
+
+            <!-- New York (upcoming) -->
+            <div class="stop-row">
+              <div class="stop-dot upcoming"></div>
+              <div class="stop-card">
+                <div class="stop-header">
+                  <div class="stop-city">New York, NY</div>
+                  <div class="stop-date">Jun 26–Jul 1 · 5 shows</div>
+                </div>
+                <div class="stop-venue">Mercury Lounge · Bowery Electric · Baby's All Right</div>
+                <div class="stop-meta">
+                  <span class="badge badge-yellow">Pending</span>
+                  <span class="stop-meta-item">📍 Tour finale</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add stop form -->
+            <div class="add-stop-form" id="addStopForm">
+              <div style="font-size:.875rem;font-weight:700;color:#fff;margin-bottom:14px;">+ New Stop</div>
+              <div class="form-row">
+                <div class="input-group" style="margin-bottom:0;">
+                  <label class="input-label">City</label>
+                  <input class="input" placeholder="e.g. Boston, MA" />
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                  <label class="input-label">Date</label>
+                  <input class="input" type="date" />
+                </div>
+              </div>
+              <div class="input-group mt-12">
+                <label class="input-label">Venue</label>
+                <input class="input" placeholder="Venue name (optional)" />
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px;">
+                <button class="btn btn-outline btn-sm" onclick="toggleAddStop()">Cancel</button>
+                <button class="btn btn-primary btn-sm">Add Stop</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RIGHT: Sidebar cards -->
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:84px;">
+
+          <!-- Gas estimate -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⛽ Gas Estimate</span>
+            </div>
+            <div style="font-size:1.5rem;font-weight:800;color:#ffd54f;margin-bottom:4px;">$590</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-bottom:14px;">Full tour · Based on $3.10/gal avg</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;">
+                <span style="color:var(--muted);">Memphis → Nashville</span><span style="color:#fff;font-weight:600;">$35</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;">
+                <span style="color:var(--muted);">Nashville → Atlanta</span><span style="color:#fff;font-weight:600;">$44</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;">
+                <span style="color:var(--muted);">Atlanta → Charlotte</span><span style="color:#fff;font-weight:600;">$41</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;">
+                <span style="color:var(--muted);">Remaining stops</span><span style="color:#fff;font-weight:600;">$470</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action items -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⚠️ Action Items</span>
+              <span class="badge badge-yellow">3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:.8rem;">
+                <span style="color:var(--yellow);margin-top:1px;">●</span>
+                <span style="color:var(--text);">Confirm Richmond venue deposit by Jun 16</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:.8rem;">
+                <span style="color:var(--yellow);margin-top:1px;">●</span>
+                <span style="color:var(--text);">Book hotel for Philadelphia (Jun 24)</span>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:.8rem;">
+                <span style="color:var(--red);margin-top:1px;">●</span>
+                <span style="color:var(--text);">Sign Philadelphia Union Transfer contract</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Travel tips -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">💡 Next Drive</span>
+            </div>
+            <div style="font-size:.875rem;font-weight:700;color:#fff;margin-bottom:4px;">Nashville → Atlanta</div>
+            <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">Jun 17 · 262 mi · ~3h 50min</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:.78rem;">
+              <div style="color:var(--muted);">⛽ Best gas before I-24 S: Shell on Bell Rd · $3.08</div>
+              <div style="color:var(--muted);">🍔 Cracker Barrel — Smyrna, TN · Mile 66</div>
+              <div style="color:var(--muted);">⚠️ Construction: I-75 near Dalton, GA — add 20 min</div>
+            </div>
+            <a href="map.html" class="btn btn-outline btn-sm mt-12" style="width:100%;text-align:center;">Open in Map →</a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item active"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  function toggleAddStop() {
+    const f = document.getElementById('addStopForm');
+    f.classList.toggle('open');
+    if (f.classList.contains('open')) f.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+</script>
+</body>
+</html>

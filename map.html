@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BandAid — Map View</title>
+  <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Map layout override — full height */
+    .main { overflow: hidden; }
+    .map-layout {
+      display: flex;
+      height: calc(100vh - var(--header-h));
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 20px;
+      background: var(--dark);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid var(--border2);
+      background: var(--card);
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .filter-chip:hover {
+      border-color: rgba(229,57,53,0.4);
+      color: var(--text);
+    }
+
+    .filter-chip.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    /* MAP AREA */
+    .map-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #16212e;
+    }
+
+    /* CSS-drawn map background */
+    .map-canvas {
+      position: absolute;
+      inset: 0;
+      background: #16212e;
+      background-image:
+        /* Broad horizontal roads */
+        linear-gradient(transparent calc(38% - 9px), #1f2e42 calc(38% - 9px), #1f2e42 calc(38% + 9px), transparent calc(38% + 9px)),
+        linear-gradient(transparent calc(57% - 6px), #1c2a3d calc(57% - 6px), #1c2a3d calc(57% + 6px), transparent calc(57% + 6px)),
+        linear-gradient(transparent calc(73% - 4px), #1c2a3d calc(73% - 4px), #1c2a3d calc(73% + 4px), transparent calc(73% + 4px)),
+        linear-gradient(transparent calc(22% - 4px), #1c2a3d calc(22% - 4px), #1c2a3d calc(22% + 4px), transparent calc(22% + 4px)),
+        /* Broad vertical roads */
+        linear-gradient(90deg, transparent calc(28% - 9px), #1f2e42 calc(28% - 9px), #1f2e42 calc(28% + 9px), transparent calc(28% + 9px)),
+        linear-gradient(90deg, transparent calc(52% - 6px), #1c2a3d calc(52% - 6px), #1c2a3d calc(52% + 6px), transparent calc(52% + 6px)),
+        linear-gradient(90deg, transparent calc(72% - 4px), #1c2a3d calc(72% - 4px), #1c2a3d calc(72% + 4px), transparent calc(72% + 4px)),
+        linear-gradient(90deg, transparent calc(15% - 3px), #1b2838 calc(15% - 3px), #1b2838 calc(15% + 3px), transparent calc(15% + 3px));
+    }
+
+    /* Park area */
+    .map-park {
+      position: absolute;
+      top: 8%;
+      left: 30%;
+      width: 16%;
+      height: 18%;
+      background: rgba(25,55,30,0.65);
+      border: 1px solid rgba(30,80,35,0.4);
+      border-radius: 50% 40% 55% 45%;
+    }
+
+    /* River */
+    .map-river {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 12%;
+      height: 100%;
+      background: rgba(10,30,70,0.7);
+      clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Building blocks */
+    .map-block {
+      position: absolute;
+      background: rgba(30,45,65,0.7);
+      border-radius: 3px;
+    }
+
+    /* Road labels */
+    .road-label {
+      position: absolute;
+      font-size: 9px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      pointer-events: none;
+      text-transform: uppercase;
+    }
+
+    /* MAP PINS */
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.15s;
+    }
+
+    .map-pin:hover { transform: translate(-50%, -100%) scale(1.15); z-index: 20; }
+
+    .pin-body {
+      width: 34px;
+      height: 34px;
+      border-radius: 50% 50% 50% 2px;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+    }
+
+    .pin-body span { transform: rotate(45deg); font-size: 0.9rem; line-height: 1; }
+
+    .pin-label {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100%);
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      display: none;
+      z-index: 30;
+    }
+
+    .map-pin:hover .pin-label { display: block; }
+
+    /* "You are here" pin */
+    .you-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      z-index: 15;
+      cursor: default;
+    }
+
+    .you-dot {
+      width: 16px;
+      height: 16px;
+      background: #2196f3;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 6px rgba(33,150,243,0.25);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(33,150,243,0.25); }
+      50% { box-shadow: 0 0 0 12px rgba(33,150,243,0.1); }
+    }
+
+    /* MAP CONTROLS */
+    .map-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 20;
+    }
+
+    .map-control-btn {
+      width: 36px;
+      height: 36px;
+      background: rgba(22,33,46,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      color: var(--text);
+      backdrop-filter: blur(6px);
+    }
+
+    .map-control-btn:hover { background: rgba(30,45,65,0.95); }
+
+    /* MAP DISCLAIMER */
+    .map-disclaimer {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      color: rgba(255,255,255,0.4);
+      font-size: 9px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* SIDE PANEL */
+    .side-panel {
+      width: 320px;
+      background: var(--dark);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .panel-count {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .panel-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .place-card {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .place-card:hover { background: rgba(255,255,255,0.03); }
+    .place-card.highlighted { background: var(--red-dim); border-color: var(--red-border); }
+
+    .place-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .place-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .place-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #fff;
+      flex: 1;
+    }
+
+    .place-dist {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .place-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    .place-type {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .place-status-open { color: var(--green); font-size: 0.72rem; font-weight: 600; }
+    .place-status-closed { color: var(--muted); font-size: 0.72rem; }
+
+    /* Search in panel */
+    .panel-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+    }
+
+    .panel-search input {
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 0.82rem;
+      color: var(--text);
+      flex: 1;
+      font-family: inherit;
+    }
+
+    .panel-search input::placeholder { color: var(--muted2); }
+
+    @media (max-width: 900px) {
+      .side-panel { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .map-layout { flex-direction: column; }
+      .map-area { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">🩹</div>
+      <div class="sidebar-logo-text">Band<span>Aid</span></div>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="planner.html" class="nav-item"><span class="nav-icon">🗓️</span> Tour Planner</a>
+      <a href="map.html" class="nav-item active"><span class="nav-icon">🗺️</span> Map View</a>
+      <a href="marketplace.html" class="nav-item"><span class="nav-icon">🎸</span> Local Talent</a>
+      <a href="budget.html" class="nav-item"><span class="nav-icon">💰</span> Budget</a>
+      <div class="nav-section-label">Discover</div>
+      <a href="stores.html" class="nav-item"><span class="nav-icon">🛒</span> Nearby Stores</a>
+      <a href="promo.html" class="nav-item"><span class="nav-icon">📣</span> Promo Tools</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="profile.html" class="sidebar-profile">
+        <div class="avatar">RC</div>
+        <div>
+          <div class="profile-name">Rust &amp; Chrome</div>
+          <div class="profile-role">Southern Rock · Memphis, TN</div>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Map View</h1>
+        <p>Nashville, TN · Near Elliston Place</p>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" title="Recenter">📍</button>
+        <button class="icon-btn" title="Layers">🗂️</button>
+        <a href="profile.html" class="avatar">RC</a>
+      </div>
+    </header>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar" id="filterBar">
+      <div class="filter-chip active" data-cat="all" onclick="filterPins('all')">All</div>
+      <div class="filter-chip" data-cat="venue" onclick="filterPins('venue')">🎵 Venues</div>
+      <div class="filter-chip" data-cat="food" onclick="filterPins('food')">🍕 Food</div>
+      <div class="filter-chip" data-cat="hotel" onclick="filterPins('hotel')">🏨 Hotels</div>
+      <div class="filter-chip" data-cat="studio" onclick="filterPins('studio')">🎙 Studios</div>
+      <div class="filter-chip" data-cat="gear" onclick="filterPins('gear')">🎸 Gear Stores</div>
+      <div class="filter-chip" data-cat="gas" onclick="filterPins('gas')">⛽ Gas</div>
+    </div>
+
+    <div class="map-layout">
+
+      <!-- MAP AREA -->
+      <div class="map-area">
+        <div class="map-canvas"></div>
+
+        <!-- Park -->
+        <div class="map-park"></div>
+
+        <!-- River (right side) -->
+        <div class="map-river"></div>
+
+        <!-- City blocks (decorative) -->
+        <div class="map-block" style="top:10%;left:5%;width:7%;height:8%;"></div>
+        <div class="map-block" style="top:20%;left:5%;width:7%;height:10%;"></div>
+        <div class="map-block" style="top:10%;left:14%;width:5%;height:7%;"></div>
+        <div class="map-block" style="top:42%;left:32%;width:7%;height:9%;"></div>
+        <div class="map-block" style="top:42%;left:41%;width:6%;height:9%;"></div>
+        <div class="map-block" style="top:62%;left:32%;width:9%;height:7%;"></div>
+        <div class="map-block" style="top:62%;left:55%;width:7%;height:8%;"></div>
+        <div class="map-block" style="top:26%;left:55%;width:9%;height:9%;"></div>
+        <div class="map-block" style="top:26%;left:66%;width:6%;height:9%;"></div>
+
+        <!-- Road labels -->
+        <div class="road-label" style="top:calc(38% + 11px);left:4%;">BROADWAY</div>
+        <div class="road-label" style="top:calc(57% + 8px);left:33%;">WEST END AVE</div>
+        <div class="road-label" style="top:10%;left:calc(28% + 11px);transform:rotate(90deg);transform-origin:left center;">5TH AVE N</div>
+        <div class="road-label" style="top:20%;left:calc(52% + 8px);transform:rotate(90deg);transform-origin:left center;">8TH AVE S</div>
+
+        <!-- YOU ARE HERE -->
+        <div class="you-pin" style="top:50%;left:47%;" title="You are here">
+          <div class="you-dot"></div>
+        </div>
+
+        <!-- VENUE PINS -->
+        <div class="map-pin" data-cat="venue" style="top:48%;left:37%;" onclick="selectPlace(0)">
+          <div class="pin-label">Exit/In ★ Tonight</div>
+          <div class="pin-body" style="background:#E53935;">
+            <span>🎵</span>
+          </div>
+        </div>
+
+        <div class="map-pin" data-cat="venue" style="top:36%;left:62%;" onclick="selectPlace(1)">
+          <div class="pin-label">The Basement</div>
+          <div class="pin-body" style="background:#c62828;">
+            <span>🎵</span>
+          </div>
+        </div>
+
+        <!-- FOOD PINS -->
+        <div class="map-pin" data-cat="food" style="top:42%;left:28%;" onclick="selectPlace(2)">
+          <div class="pin-label">Hattie B's</div>
+          <div class="pin-body" style="background:#FF6B35;">
+            <span>🍗</span>
+          </div>
+        </div>
+
+        <div class="map-pin" data-cat="food" style="top:62%;left:44%;" onclick="selectPlace(3)">
+          <div class="pin-label">Roberts Western World</div>
+          <div class="pin-body" style="background:#e64a19;">
+            <span>🌮</span>
+          </div>
+        </div>
+
+        <!-- HOTEL PINS -->
+        <div class="map-pin" data-cat="hotel" style="top:32%;left:48%;" onclick="selectPlace(4)">
+          <div class="pin-label">Graduate Nashville</div>
+          <div class="pin-body" style="background:#1565c0;">
+            <span>🏨</span>
+          </div>
+        </div>
+
+        <div class="map-pin" data-cat="hotel" style="top:55%;left:65%;" onclick="selectPlace(5)">
+          <div class="pin-label">Marriott Downtown</div>
+          <div class="pin-body" style="background:#0d47a1;">
+            <span>🏨</span>
+          </div>
+        </div>
+
+        <!-- STUDIO PINS -->
+        <div class="map-pin" data-cat="studio" style="top:28%;left:22%;" onclick="selectPlace(6)">
+          <div class="pin-label">Trace Recording</div>
+          <div class="pin-body" style="background:#6a1b9a;">
+            <span>🎙</span>
+          </div>
+        </div>
+
+        <!-- GEAR PINS -->
+        <div class="map-pin" data-cat="gear" style="top:60%;left:54%;" onclick="selectPlace(7)">
+          <div class="pin-label">Guitar City Nashville</div>
+          <div class="pin-body" style="background:#2e7d32;">
+            <span>🎸</span>
+          </div>
+        </div>
+
+        <div class="map-pin" data-cat="gear" style="top:50%;left:70%;" onclick="selectPlace(8)">
+          <div class="pin-label">Strings &amp; Things</div>
+          <div class="pin-body" style="background:#1b5e20;">
+            <span>🔧</span>
+          </div>
+        </div>
+
+        <!-- GAS PINS -->
+        <div class="map-pin" data-cat="gas" style="top:68%;left:38%;" onclick="selectPlace(9)">
+          <div class="pin-label">Shell · $3.09</div>
+          <div class="pin-body" style="background:#f57f17;">
+            <span>⛽</span>
+          </div>
+        </div>
+
+        <!-- Map controls -->
+        <div class="map-controls">
+          <div class="map-control-btn" title="Zoom in">＋</div>
+          <div class="map-control-btn" title="Zoom out">－</div>
+          <div class="map-control-btn" title="My location">📍</div>
+        </div>
+
+        <div class="map-disclaimer">Map mock — interactive map powered by Google Maps in production</div>
+      </div>
+
+      <!-- SIDE PANEL -->
+      <div class="side-panel">
+        <div class="panel-header">
+          <div class="card-title">Nearby Places</div>
+          <div class="panel-count" id="panelCount">Showing all 10 results near you</div>
+          <div class="panel-search" style="margin-top:10px;margin-bottom:0;">
+            <span style="color:var(--muted);font-size:.9rem;">🔍</span>
+            <input type="text" placeholder="Search stores, venues, food…" />
+          </div>
+        </div>
+
+        <div class="panel-list" id="placeList">
+          <!-- Tonight -->
+          <div class="place-card highlighted" id="place-0">
+            <div class="place-top">
+              <div class="place-icon" style="background:var(--red-dim);">🎵</div>
+              <div class="place-name">Exit/In</div>
+              <div class="place-dist">0.0 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Live Music Venue · TONIGHT</span>
+              <span class="place-status-open">● Showtime 9 PM</span>
+            </div>
+            <div class="tags" style="margin-top:6px;">
+              <span class="badge badge-red">Tonight's Show</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-2" data-cat="food">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(255,107,53,0.15);">🍗</div>
+              <div class="place-name">Hattie B's Hot Chicken</div>
+              <div class="place-dist">0.3 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Restaurant · $$ · 4.7★</span>
+              <span class="place-status-open">● Open until 10 PM</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-4" data-cat="hotel">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(33,150,243,0.15);">🏨</div>
+              <div class="place-name">Graduate Nashville</div>
+              <div class="place-dist">0.7 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Hotel · Avg $149/night</span>
+              <span class="place-status-open">● Available</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-9" data-cat="gas">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(255,193,7,0.15);">⛽</div>
+              <div class="place-name">Shell — Elliston Place</div>
+              <div class="place-dist">0.4 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Gas Station · Regular $3.09/gal</span>
+              <span class="place-status-open">● Open 24hr</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-7" data-cat="gear">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(76,175,80,0.15);">🎸</div>
+              <div class="place-name">Guitar City Nashville</div>
+              <div class="place-dist">1.1 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Music Store · Strings, Amps, Cables</span>
+              <span class="place-status-open">● Open until 9 PM</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-6" data-cat="studio">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(156,39,176,0.15);">🎙</div>
+              <div class="place-name">Trace Recording Studio</div>
+              <div class="place-dist">1.3 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Recording Studio · $75/hr</span>
+              <span class="place-status-open">● Available tonight</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-1" data-cat="venue">
+            <div class="place-top">
+              <div class="place-icon" style="background:var(--red-dim);">🎵</div>
+              <div class="place-name">The Basement</div>
+              <div class="place-dist">1.5 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Live Music Venue · Cap. 250</span>
+              <span class="place-status-open">● Show tonight at 8 PM</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-8" data-cat="gear">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(76,175,80,0.15);">🔧</div>
+              <div class="place-name">Strings &amp; Things Repair</div>
+              <div class="place-dist">1.8 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Guitar Repair Shop · Same-day</span>
+              <span class="place-status-open">● Open until 8 PM</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-5" data-cat="hotel">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(33,150,243,0.15);">🏨</div>
+              <div class="place-name">Marriott Downtown</div>
+              <div class="place-dist">2.1 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Hotel · Avg $189/night</span>
+              <span class="place-status-open">● Available</span>
+            </div>
+          </div>
+
+          <div class="place-card" id="place-3" data-cat="food">
+            <div class="place-top">
+              <div class="place-icon" style="background:rgba(255,107,53,0.15);">🌮</div>
+              <div class="place-name">Roberts Western World</div>
+              <div class="place-dist">2.3 mi</div>
+            </div>
+            <div class="place-meta">
+              <span class="place-type">Food + Live Music · $ · 4.5★</span>
+              <span class="place-status-open">● Open until midnight</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-items">
+    <a href="dashboard.html" class="bottom-nav-item"><span class="nav-icon">🏠</span><span>Home</span></a>
+    <a href="map.html" class="bottom-nav-item active"><span class="nav-icon">🗺️</span><span>Map</span></a>
+    <a href="marketplace.html" class="bottom-nav-item"><span class="nav-icon">🎸</span><span>Find</span></a>
+    <a href="planner.html" class="bottom-nav-item"><span class="nav-icon">🗓️</span><span>Plan</span></a>
+    <a href="budget.html" class="bottom-nav-item"><span class="nav-icon">💰</span><span>Budget</span></a>
+  </div>
+</nav>
+
+<script>
+  const catColors = {
+    venue: '#E53935', food: '#FF6B35', hotel: '#1565c0',
+    studio: '#6a1b9a', gear: '#2e7d32', gas: '#f57f17'
+  };
+
+  function filterPins(cat) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-cat="${cat}"]`).classList.add('active');
+
+    const pins = document.querySelectorAll('.map-pin');
+    pins.forEach(pin => {
+      const pinCat = pin.dataset.cat;
+      pin.style.display = (cat === 'all' || cat === pinCat) ? 'block' : 'none';
+    });
+
+    const cards = document.querySelectorAll('.place-card[data-cat]');
+    const count = { all: 10 };
+    cards.forEach(card => {
+      const cardCat = card.dataset.cat;
+      card.style.display = (cat === 'all' || cat === cardCat) ? 'block' : 'none';
+    });
+
+    // Update count label
+    const visible = cat === 'all'
+      ? document.querySelectorAll('.place-card').length
+      : document.querySelectorAll(`.place-card[data-cat="${cat}"]`).length;
+    const catLabel = cat === 'all' ? 'all' : cat + 's';
+    document.getElementById('panelCount').textContent = `Showing ${visible} ${catLabel} near you`;
+  }
+
+  function selectPlace(idx) {
+    document.querySelectorAll('.place-card').forEach(c => c.classList.remove('highlighted'));
+    const el = document.getElementById('place-' + idx);
+    if (el) {
+      el.classList.add('highlighted');
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+</script>
+</body>
+</html>
